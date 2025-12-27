@@ -1,4 +1,5 @@
 import 'package:cupcake/config/api/api_service.dart';
+import 'package:cupcake/features/algorithm_engine/data/models/ipo_model.dart';
 
 import '../../../home/data/models/indian_market_model.dart';
 
@@ -11,6 +12,10 @@ class IndianMarketRepository {
     }
     return [];
   }
+
+  // Future<List<IpoList>> fetchIPO() async{
+
+  // }
 
   Future<List<IndianStockRaw>> trending() async {
     final res = await _client.getRequest('/trending');
