@@ -1,4 +1,6 @@
 import 'package:cupcake/core/global_widgets/custom_text_button.dart';
+import 'package:cupcake/features/home/presentation/ipo_screen.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers/home_screen_providers.dart';
@@ -39,6 +41,12 @@ class TopIPOsSection extends ConsumerWidget {
                     await ref.read(ipoWithGmpProvider.future);
                   },
                   title: 'Refresh',
+                ),
+                CustomTextButton(
+                  ontap: () async {
+                    Navigator.push(context, CupertinoPageRoute(builder: (context) => const IpoScreen()));
+                  },
+                  title: 'See All',
                 ),
                 16.widthBox,
               ],
