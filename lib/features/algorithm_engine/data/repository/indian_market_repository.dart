@@ -34,7 +34,7 @@ class IndianMarketRepository {
     final list = _extractList(res);
     return list.map((e) => IndianStockRaw.fromJson(e)).toList();
   }
-
+  
   Future<List<IndianStockRaw>> priceShockers() async {
     final res = await _client.getRequest('/price_shockers');
     final list = _extractList(res);
