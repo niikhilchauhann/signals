@@ -173,7 +173,6 @@ class TradeRepository {
     await collect(await _marketRepo.priceShockers());
     await collect(await _marketRepo.week52());
 
-    // 🔥 fallback if APIs temporarily empty
     if (sets.isEmpty) {
       return [
         TradeSetup(

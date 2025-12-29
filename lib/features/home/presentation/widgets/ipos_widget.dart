@@ -1,8 +1,10 @@
 import 'package:cupcake/core/global_widgets/custom_text_button.dart';
+import 'package:cupcake/features/algorithm_engine/data/models/ipo_model.dart';
 import 'package:cupcake/features/home/presentation/ipo_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../algorithm_engine/data/providers/ipo_provider.dart';
 import '../../providers/home_screen_providers.dart';
 import '/config/theme/app_text_theme.dart';
 
@@ -14,8 +16,8 @@ class TopIPOsSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final ipos = ref.watch(ipoWithGmpProvider);
     final refresh = ref.read(ipoRefreshProvider);
+    final ipos = ref.watch(enrichedActiveIposProvider);
 
     return ipos.when(
       loading: () => Center(child: const CircularProgressIndicator()).py(32),
@@ -35,16 +37,23 @@ class TopIPOsSection extends ConsumerWidget {
                     style: AppTextTheme.size20Bold,
                   ).px(16),
                 ),
+
                 CustomTextButton(
                   ontap: () async {
                     refresh();
-                    await ref.read(ipoWithGmpProvider.future);
+                    // await ref.read(ipoWithGmpProvider.future);
                   },
                   title: 'Refresh',
                 ),
+                12.widthBox,
                 CustomTextButton(
                   ontap: () async {
-                    Navigator.push(context, CupertinoPageRoute(builder: (context) => const IpoScreen()));
+                    Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                        builder: (context) => const IpoScreen(),
+                      ),
+                    );
                   },
                   title: 'See All',
                 ),
@@ -52,7 +61,7 @@ class TopIPOsSection extends ConsumerWidget {
               ],
             ),
             SizedBox(
-              height: 220,
+              height: 245,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -60,13 +69,7 @@ class TopIPOsSection extends ConsumerWidget {
                 separatorBuilder: (_, __) => const SizedBox(width: 12),
                 itemBuilder: (context, index) {
                   final ipo = data[index];
-                  return IpoCard(
-                    name: ipo.name,
-                    gmp: ipo.gmp,
-                    subscribed: ipo.subscription,
-                    dates: ipo.dates,
-                    type: ipo.type,
-                  );
+                  return IpoCard(ipo: ipo);
                 },
               ),
             ),
@@ -78,20 +81,9 @@ class TopIPOsSection extends ConsumerWidget {
 }
 
 class IpoCard extends StatelessWidget {
-  final String name;
-  final String gmp;
-  final String subscribed;
-  final String dates;
-  final String type;
+  final IPOModel ipo;
 
-  const IpoCard({
-    super.key,
-    required this.name,
-    required this.gmp,
-    required this.subscribed,
-    required this.dates,
-    required this.type,
-  });
+  const IpoCard({super.key, required this.ipo});
 
   @override
   Widget build(BuildContext context) {
@@ -107,15 +99,19 @@ class IpoCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            name,
+            ipo.name,
             maxLines: 2,
             style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
           ),
           const SizedBox(height: 8),
-          IPORow(label: "GMP", value: gmp),
-          IPORow(label: "Subscribed", value: "${subscribed}x"),
-          IPORow(label: "Dates", value: dates),
-          IPORow(label: "Type", value: type),
+          IPORow(label: "Type", value: ipo.isSme ? 'SME' : 'Mainboard'),
+          IPORow(
+            label: "End Date",
+            value: ipo.biddingEndDate.toString().split(' ').first,
+          ),
+          IPORow(label: "GMP", value: ipo.gmp ?? '—'),
+          IPORow(label: "Confidence", value: "${ipo.confidence}"),
+          IPORow(label: "Sentiment", value: ipo.sentiment ?? 'Neutral'),
         ],
       ),
     );

@@ -15,3 +15,6 @@ Home
 Discover
 Lens
 Watchlist
+
+ToDo:
+IndianAPI is inconsistent in providing some data like IPO data; sends double, int, null which causes hurdle in developments.

@@ -2,8 +2,7 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 // import 'package:http/http.dart' as http;
-import '../models/ipo_model.dart';
-
+import '../../../algorithm_engine/data/models/ipo_model.dart';
 // final String openAIApiKey = dotenv.env['OPENAI_API'] ?? '';
 // class OpenAIRepository {
 //   Future<IpoAIAnalysis> analyzeIpoGmp({

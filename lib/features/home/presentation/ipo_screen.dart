@@ -1,3 +1,4 @@
+import 'package:cupcake/features/algorithm_engine/data/models/ipo_model.dart';
 import 'package:cupcake/features/algorithm_engine/data/providers/ipo_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -130,7 +131,7 @@ class IpoScreen extends ConsumerWidget {
   }
 
   // 🎨 Beautiful IPO Card
-  Widget _ipoCard(item) {
+  Widget _ipoCard(IPOModel item) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
@@ -168,7 +169,7 @@ class IpoScreen extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                item.status.name.toUpperCase(),
+                item.status.label,
                 style: const TextStyle(color: Colors.orangeAccent),
               ),
               Text(

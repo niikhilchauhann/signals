@@ -53,7 +53,6 @@ class MarketRepository {
     final high = highs.reduce((a, b) => a > b ? a : b);
     final low = lows.reduce((a, b) => a < b ? a : b);
 
-    // 🔥 Bias logic
     String bias;
     if (last > open * 1.002) {
       bias = 'Bullish';
@@ -63,7 +62,6 @@ class MarketRepository {
       bias = 'Range-bound';
     }
 
-    // 🔥 Intraday actionable levels
     final range = high - low;
     final buyAbove = high - (range * 0.2);
     final sellBelow = low + (range * 0.2);
