@@ -1,81 +1,97 @@
-// To parse this JSON data, do
-//
-//     final weekHighLowData = weekHighLowDataFromJson(jsonString);
-
 import 'dart:convert';
 
-WeekHighLowData weekHighLowDataFromJson(String str) => WeekHighLowData.fromJson(json.decode(str));
+/// ===============================
+/// MAIN RESPONSE
+/// ===============================
+class Week52Response {
+  final Exchange52Data bse;
+  final Exchange52Data nse;
 
-String weekHighLowDataToJson(WeekHighLowData data) => json.encode(data.toJson());
+  Week52Response({
+    required this.bse,
+    required this.nse,
+  });
 
-class WeekHighLowData {
-    Se52WeekHighLow bse52WeekHighLow;
-    Se52WeekHighLow nse52WeekHighLow;
-
-    WeekHighLowData({
-        required this.bse52WeekHighLow,
-        required this.nse52WeekHighLow,
-    });
-
-    factory WeekHighLowData.fromJson(Map<String, dynamic> json) => WeekHighLowData(
-        bse52WeekHighLow: Se52WeekHighLow.fromJson(json["BSE_52WeekHighLow"]),
-        nse52WeekHighLow: Se52WeekHighLow.fromJson(json["NSE_52WeekHighLow"]),
+  factory Week52Response.fromJson(Map<String, dynamic> json) {
+    return Week52Response(
+      bse: Exchange52Data.fromJson(json['BSE_52WeekHighLow']),
+      nse: Exchange52Data.fromJson(json['NSE_52WeekHighLow']),
     );
-
-    Map<String, dynamic> toJson() => {
-        "BSE_52WeekHighLow": bse52WeekHighLow.toJson(),
-        "NSE_52WeekHighLow": nse52WeekHighLow.toJson(),
-    };
+  }
 }
 
-class Se52WeekHighLow {
-    List<The52Week> high52Week;
-    List<The52Week> low52Week;
+/// ===============================
+/// EXCHANGE DATA
+/// ===============================
+class Exchange52Data {
+  final List<Week52High> high52Week;
+  final List<Week52Low> low52Week;
 
-    Se52WeekHighLow({
-        required this.high52Week,
-        required this.low52Week,
-    });
+  Exchange52Data({
+    required this.high52Week,
+    required this.low52Week,
+  });
 
-    factory Se52WeekHighLow.fromJson(Map<String, dynamic> json) => Se52WeekHighLow(
-        high52Week: List<The52Week>.from(json["high52Week"].map((x) => The52Week.fromJson(x))),
-        low52Week: List<The52Week>.from(json["low52Week"].map((x) => The52Week.fromJson(x))),
+  factory Exchange52Data.fromJson(Map<String, dynamic> json) {
+    return Exchange52Data(
+      high52Week: (json['high52Week'] as List)
+          .map((e) => Week52High.fromJson(e))
+          .toList(),
+      low52Week: (json['low52Week'] as List)
+          .map((e) => Week52Low.fromJson(e))
+          .toList(),
     );
-
-    Map<String, dynamic> toJson() => {
-        "high52Week": List<dynamic>.from(high52Week.map((x) => x.toJson())),
-        "low52Week": List<dynamic>.from(low52Week.map((x) => x.toJson())),
-    };
+  }
 }
 
-class The52Week {
-    String ticker;
-    String company;
-    double price;
-    double? the52WeekHigh;
-    double? the52WeekLow;
+/// ===============================
+/// HIGH MODEL
+/// ===============================
+class Week52High {
+  final String ticker;
+  final String company;
+  final double price;
+  final double high52Week;
 
-    The52Week({
-        required this.ticker,
-        required this.company,
-        required this.price,
-        this.the52WeekHigh,
-        this.the52WeekLow,
-    });
+  Week52High({
+    required this.ticker,
+    required this.company,
+    required this.price,
+    required this.high52Week,
+  });
 
-    factory The52Week.fromJson(Map<String, dynamic> json) => The52Week(
-        ticker: json["ticker"],
-        company: json["company"],
-        price: json["price"]?.toDouble(),
-        the52WeekHigh: json["52_week_high"]?.toDouble(),
-        the52WeekLow: json["52_week_low"]?.toDouble(),
+  factory Week52High.fromJson(Map<String, dynamic> json) {
+    return Week52High(
+      ticker: json['ticker'],
+      company: json['company'],
+      price: (json['price'] ?? 0).toDouble(),
+      high52Week: (json['52_week_high'] ?? 0).toDouble(),
     );
+  }
+}
 
-    Map<String, dynamic> toJson() => {
-        "ticker": ticker,
-        "company": company,
-        "price": price,
-        "52_week_high": the52WeekHigh,
-        "52_week_low": the52WeekLow,
-    };
+/// ===============================
+/// LOW MODEL
+/// ===============================
+class Week52Low {
+  final String ticker;
+  final String company;
+  final double price;
+  final double low52Week;
+
+  Week52Low({
+    required this.ticker,
+    required this.company,
+    required this.price,
+    required this.low52Week,
+  });
+
+  factory Week52Low.fromJson(Map<String, dynamic> json) {
+    return Week52Low(
+      ticker: json['ticker'],
+      company: json['company'],
+      price: (json['price'] ?? 0).toDouble(),
+      low52Week: (json['52_week_low'] ?? 0).toDouble(),
+    );
+  }
 }

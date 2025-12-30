@@ -12,8 +12,7 @@ final ipoProvider = FutureProvider<IpoList>((ref) async {
 
 final ipoFilterProvider = StateProvider<String>((ref) => 'upcoming');
 final searchProvider = StateProvider<String>((ref) => '');
-final sortProvider = StateProvider<bool>((ref) => true); // true = latest first
-
+final sortProvider = StateProvider<bool>((ref) => true); 
 
 final activeIposProvider = Provider<List<IPOModel>>((ref) {
   final ipoAsync = ref.watch(ipoProvider);
