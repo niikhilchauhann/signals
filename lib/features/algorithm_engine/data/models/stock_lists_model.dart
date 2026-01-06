@@ -1,8 +1,55 @@
+
 import 'dart:convert';
 
-/// ===============================
-/// MAIN RESPONSE
-/// ===============================
+import 'uni_stock_model.dart';
+
+List<StockModel> bseStockListFromJson(String str) =>
+    List<StockModel>.from(
+      json.decode(str).map((x) => StockModel.fromJson(x)),
+    );
+
+List<StockModel> nseStockListFromJson(String str) =>
+    List<StockModel>.from(
+      json.decode(str).map((x) => StockModel.fromJson(x)),
+    );
+
+TrendingStockResponse trendingStockResponseFromJson(String str) =>
+    TrendingStockResponse.fromJson(json.decode(str));
+
+class TrendingStockResponse {
+  final TrendingStocks trendingStocks;
+
+  TrendingStockResponse({required this.trendingStocks});
+
+  factory TrendingStockResponse.fromJson(Map<String, dynamic> json) {
+    return TrendingStockResponse(
+      trendingStocks:
+          TrendingStocks.fromJson(json['trending_stocks']),
+    );
+  }
+}
+
+class TrendingStocks {
+  final List<StockModel> topGainers;
+  final List<StockModel> topLosers;
+
+  TrendingStocks({
+    required this.topGainers,
+    required this.topLosers,
+  });
+
+  factory TrendingStocks.fromJson(Map<String, dynamic> json) {
+    return TrendingStocks(
+      topGainers: List<StockModel>.from(
+        json['top_gainers'].map((x) => StockModel.fromJson(x)),
+      ),
+      topLosers: List<StockModel>.from(
+        json['top_losers'].map((x) => StockModel.fromJson(x)),
+      ),
+    );
+  }
+}
+
 class Week52Response {
   final Exchange52Data bse;
   final Exchange52Data nse;
@@ -20,9 +67,6 @@ class Week52Response {
   }
 }
 
-/// ===============================
-/// EXCHANGE DATA
-/// ===============================
 class Exchange52Data {
   final List<Week52High> high52Week;
   final List<Week52Low> low52Week;
@@ -44,9 +88,6 @@ class Exchange52Data {
   }
 }
 
-/// ===============================
-/// HIGH MODEL
-/// ===============================
 class Week52High {
   final String ticker;
   final String company;
@@ -70,9 +111,6 @@ class Week52High {
   }
 }
 
-/// ===============================
-/// LOW MODEL
-/// ===============================
 class Week52Low {
   final String ticker;
   final String company;

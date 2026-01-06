@@ -19,8 +19,9 @@ class _AppStructureState extends State<AppStructure> {
   List<Widget> screens = [
     HomeScreen(),
     DiscoverScreen(),
+    SizedBox(),
     LensScreen(),
-    WatchlistScreen()
+    WatchlistScreen(),
   ];
 
   @override

@@ -15,6 +15,8 @@ void main() async {
   }
   await Hive.initFlutter();
   await Hive.openBox('cache');
+
+  await Hive.openBox<List>('watchlist_box');
   // await Supabase.initialize(
   //   url: dotenv.env['SUPABASE_URL'] ?? '',
   //   anonKey:  dotenv.env['ANON_KEY'] ?? '',

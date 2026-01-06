@@ -1,7 +1,8 @@
 import 'package:cupcake/features/algorithm_engine/data/models/ipo_model.dart';
-import 'package:cupcake/features/algorithm_engine/data/providers/ipo_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../algorithm_engine/data/providers/other_assets_provider.dart';
 
 class IpoScreen extends ConsumerWidget {
   const IpoScreen({super.key});

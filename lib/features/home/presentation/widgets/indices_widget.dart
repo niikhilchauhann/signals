@@ -117,7 +117,7 @@ class MarketOverviewCard extends ConsumerWidget {
               SizedBox(height: 8),
 
               Text(
-                "Note: " + data.note.toString(),
+                "Note: ${data.note}",
                 style: AppTextTheme.size14Bold.copyWith(
                   color: AppColors.white,
                   // fontSize: 13,

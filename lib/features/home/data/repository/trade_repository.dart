@@ -1,13 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../models/indian_market_model.dart';
+import '../../../algorithm_engine/data/repository/stock_repository.dart';
 import '../models/trade_analyzer.dart';
 import '../models/trade_model.dart';
-import '../../../algorithm_engine/data/repository/indian_market_repository.dart';
-
 
 class TradeRepository {
-  final _marketRepo = IndianMarketRepository();
+  final _marketRepo = StockRepository();
   final _analyzer = TradeAnalyzer();
 
   Future<List<TradeSetup>> searchTradeAnalysis({String symbol = 'KALYANKJIL.NS'}) async {
@@ -160,18 +158,18 @@ class TradeRepository {
   Future<List<TradeSetup>> fetchTopTrades() async {
     final sets = <String, TradeSetup>{};
 
-    Future<void> collect(List<IndianStockRaw> list) async {
+    Future<void> collect(List<dynamic> list) async {
       for (final s in list) {
         final trade = _analyzer.analyze(s);
         sets[trade.symbol] = trade;
       }
     }
 
-    await collect(await _marketRepo.trending());
-    await collect(await _marketRepo.nseMostActive());
-    await collect(await _marketRepo.bseMostActive());
-    await collect(await _marketRepo.priceShockers());
-    await collect(await _marketRepo.week52());
+    // await collect(await _marketRepo.fetchTrendingStocks());
+    // await collect(await _marketRepo.fetchNseMostActiveStocks());
+    // await collect(await _marketRepo.fetchBseMostActiveStocks());
+    // await collect(await _marketRepo.fetchPriceShockers());
+    // await collect(await _marketRepo.fetchWeek52Data());
 
     if (sets.isEmpty) {
       return [

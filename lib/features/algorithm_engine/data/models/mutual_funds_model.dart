@@ -1,8 +1,3 @@
-import 'dart:convert';
-
-/// ================================
-/// MAIN RESPONSE MODEL
-/// ================================
 class MutualFundResponse {
   final Map<String, Map<String, List<FundModel>>> data;
 
@@ -27,9 +22,6 @@ class MutualFundResponse {
   }
 }
 
-/// ================================
-/// FUND MODEL
-/// ================================
 class FundModel {
   final String fundName;
   final double? latestNav;

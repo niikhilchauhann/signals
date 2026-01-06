@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/models/market_overview.dart';
 import '../data/models/trade_model.dart';
-import '../data/repository/ipo_repository.dart';
 import '../data/repository/market_repository.dart';
 import '../data/repository/trade_repository.dart';
 

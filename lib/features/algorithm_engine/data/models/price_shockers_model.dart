@@ -1,15 +1,10 @@
-import 'dart:convert';
-
-/// ===============================
-/// MAIN RESPONSE
-/// ===============================
-class BsePriceShockerResponse {
+class PriceShockerResponse {
   final List<PriceShockerStock> stocks;
 
-  BsePriceShockerResponse({required this.stocks});
+  PriceShockerResponse({required this.stocks});
 
-  factory BsePriceShockerResponse.fromJson(Map<String, dynamic> json) {
-    return BsePriceShockerResponse(
+  factory PriceShockerResponse.fromJson(Map<String, dynamic> json) {
+    return PriceShockerResponse(
       stocks: (json['BSE_PriceShocker'] as List)
           .map((e) => PriceShockerStock.fromJson(e))
           .toList(),
@@ -17,9 +12,6 @@ class BsePriceShockerResponse {
   }
 }
 
-/// ===============================
-/// STOCK MODEL
-/// ===============================
 class PriceShockerStock {
   final String tickerId;
   final String ric;

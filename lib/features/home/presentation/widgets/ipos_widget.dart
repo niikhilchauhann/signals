@@ -4,7 +4,7 @@ import 'package:cupcake/features/home/presentation/ipo_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../algorithm_engine/data/providers/ipo_provider.dart';
+import '../../../algorithm_engine/data/providers/other_assets_provider.dart';
 import '../../providers/home_screen_providers.dart';
 import '/config/theme/app_text_theme.dart';
 
