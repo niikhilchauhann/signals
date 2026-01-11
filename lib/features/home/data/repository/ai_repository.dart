@@ -60,49 +60,96 @@ import '../../../algorithm_engine/data/models/ipo_model.dart';
 // }
 
 final String geminiApiKey = dotenv.env['GEMINI_API'] ?? '';
+
 class GeminiRepository {
   final GenerativeModel _model;
 
   GeminiRepository()
-      : _model = GenerativeModel(
-          model: 'gemini-2.0-flash',
-          apiKey: geminiApiKey,
-          generationConfig: GenerationConfig(
-            temperature: 0.2,
-            responseMimeType: 'application/json',
-          ),
-        );
+    : _model = GenerativeModel(
+        model: 'gemini-2.0-flash',
+        apiKey: geminiApiKey,
+        generationConfig: GenerationConfig(
+          temperature: 0.2,
+          responseMimeType: 'application/json',
+        ),
+      );
+
+  //   Future<IpoAIAnalysis> analyzeIpoGmp({
+  //     required String ipoName,
+  //     required String newsText,
+  //   }) async {
+
+  //     final prompt =
+  //         '''
+  // You are an IPO market analyst in India.
+
+  // IPO: $ipoName
+
+  // Below is recent IPO news. Extract:
+  // 1. Grey Market Premium (GMP) — numeric value ONLY (example: "+₹11.5" or "41%")
+  // 2. Sentiment (Positive / Neutral / Negative)
+  // 3. Confidence (High / Medium / Low)
+
+  // If multiple GMP values exist, return the MOST RECENT one.
+  // If GMP is not found, return null.
+
+  // Return STRICT JSON ONLY:
+  // {
+  //   "gmp": "+₹11.5",
+  //   "sentiment": "Positive",
+  //   "confidence": "High"
+  // }
+
+  // NEWS:
+  // $newsText
+  // ''';
+
+  //     final response = await _model.generateContent([Content.text(prompt)]);
+  //     final text = response.text ?? '{}';
+
+  //     return IpoAIAnalysis.fromJson(jsonDecode(text));
+  //   }
 
   Future<IpoAIAnalysis> analyzeIpoGmp({
     required String ipoName,
     required String newsText,
   }) async {
-    final prompt = '''
-You are a financial analyst.
+    final response = await _model.generateContent([
+      Content.text(_buildPrompt(ipoName, newsText)),
+    ]);
+
+    final raw = response.text ?? '';
+
+    // 🔥 CLEANUP STEP
+    final cleaned = raw.replaceAll('```json', '').replaceAll('```', '').trim();
+
+    if (cleaned.isEmpty) {
+      throw Exception('Empty Gemini response');
+    }
+
+    final decoded = jsonDecode(cleaned) as Map<String, dynamic>;
+
+    return IpoAIAnalysis.fromJson(decoded);
+  }
+
+  String _buildPrompt(String ipoName, String newsText) =>
+      '''
+You are a financial data extractor.
+
+ONLY respond with valid minified JSON.
+NO markdown.
+NO explanations.
+NO extra text.
+
+If GMP is not explicitly stated, return:
+"gmp": "—"
+
+JSON schema:
+{"gmp":"string","sentiment":"Positive|Neutral|Negative","confidence":"High|Medium|Low"}
 
 IPO: $ipoName
-
-From the news text below, extract:
-1. Grey Market Premium (GMP) if mentioned
-2. Overall sentiment (Positive / Neutral / Negative)
-3. Confidence level (High / Medium / Low)
-
-If GMP is not mentioned, return "Not available".
-
-Return STRICT JSON ONLY:
-{
-  "gmp": "+₹120",
-  "sentiment": "Positive",
-  "confidence": "High"
-}
 
 News:
 $newsText
 ''';
-
-    final response = await _model.generateContent([Content.text(prompt)]);
-    final text = response.text ?? '{}';
-
-    return IpoAIAnalysis.fromJson(jsonDecode(text));
-  }
 }

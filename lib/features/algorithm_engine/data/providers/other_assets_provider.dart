@@ -15,27 +15,38 @@ final ipoFilterProvider = StateProvider<String>((ref) => 'upcoming');
 final searchProvider = StateProvider<String>((ref) => '');
 final sortProvider = StateProvider<bool>((ref) => true); 
 
-final activeIposProvider = Provider<List<IPOModel>>((ref) {
-  final ipoAsync = ref.watch(ipoProvider);
+// final activeIposProvider = Provider<List<IPOModel>>((ref) {
+//   final ipoAsync = ref.watch(ipoProvider);
 
-  return ipoAsync.maybeWhen(
-    data: (list) => list.active,
-    orElse: () => [],
-  );
-});
+//   return ipoAsync.maybeWhen(
+//     data: (list) => list.active,
+//     orElse: () => [],
+//   );
+// });
 
 final ipoAiEnrichmentRepositoryProvider =
     Provider((ref) => IpoAiEnrichmentRepository());
 
+// final enrichedActiveIposProvider =
+//     FutureProvider<List<IPOModel>>((ref) async {
+//   final activeIpos = ref.watch(activeIposProvider);
+
+//   if (activeIpos.isEmpty) return [];
+
+//   final repo = ref.read(ipoAiEnrichmentRepositoryProvider);
+//   return repo.enrichActiveIpos(activeIpos);
+// });
 final enrichedActiveIposProvider =
     FutureProvider<List<IPOModel>>((ref) async {
-  final activeIpos = ref.watch(activeIposProvider);
+  final ipoList = await ref.watch(ipoProvider.future);
 
+  final activeIpos = ipoList.active;
   if (activeIpos.isEmpty) return [];
 
   final repo = ref.read(ipoAiEnrichmentRepositoryProvider);
   return repo.enrichActiveIpos(activeIpos);
 });
+
 
 final newsProvider = FutureProvider<List<NewsArticle>>((ref) async {
   final repo = ref.read(stockRepositoryProvider);

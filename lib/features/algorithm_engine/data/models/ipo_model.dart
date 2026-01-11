@@ -105,54 +105,113 @@ class IPOModel {
     this.confidence,
   });
 
+  // factory IPOModel.fromJson(Map<String, dynamic> json) {
+  //   return IPOModel(
+  //     symbol: json["symbol"] ?? "",
+  //     name: json["name"] ?? "",
+  //     status: statusValues.map[json["status"]] ?? Status.UPCOMING,
+  //     isSme: json["is_sme"] ?? false,
+  //     additionalText: json["additional_text"] ?? "",
+
+  //     minPrice: _toDouble(json["min_price"]),
+  //     maxPrice: _toDouble(json["max_price"]),
+  //     issuePrice: _toDouble(json["issue_price"]),
+  //     listingGains: _toDouble(json["listing_gains"]),
+  //     listingPrice: _toDouble(json["listing_price"]),
+
+  //     biddingStartDate: json["bidding_start_date"] != null
+  //         ? DateTime.tryParse(json["bidding_start_date"])
+  //         : null,
+
+  //     biddingEndDate: json["bidding_end_date"] != null
+  //         ? DateTime.tryParse(json["bidding_end_date"])
+  //         : null,
+
+  //     listingDate: json["listing_date"] != null
+  //         ? DateTime.tryParse(json["listing_date"])
+  //         : null,
+
+  //     lotSize: _toInt(json["lot_size"]),
+  //     documentUrl: json["document_url"],
+  //   );
+  // }
   factory IPOModel.fromJson(Map<String, dynamic> json) {
-    return IPOModel(
-      symbol: json["symbol"] ?? "",
-      name: json["name"] ?? "",
-      status: statusValues.map[json["status"]] ?? Status.UPCOMING,
-      isSme: json["is_sme"] ?? false,
-      additionalText: json["additional_text"] ?? "",
+  return IPOModel(
+    symbol: json["symbol"] ?? "",
+    name: json["name"] ?? "",
+    status: statusValues.map[json["status"]] ?? Status.UPCOMING,
+    isSme: json["is_sme"] ?? false,
+    additionalText: json["additional_text"] ?? "",
 
-      minPrice: _toDouble(json["min_price"]),
-      maxPrice: _toDouble(json["max_price"]),
-      issuePrice: _toDouble(json["issue_price"]),
-      listingGains: _toDouble(json["listing_gains"]),
-      listingPrice: _toDouble(json["listing_price"]),
+    minPrice: _toDouble(json["min_price"]),
+    maxPrice: _toDouble(json["max_price"]),
+    issuePrice: _toDouble(json["issue_price"]),
+    listingGains: _toDouble(json["listing_gains"]),
+    listingPrice: _toDouble(json["listing_price"]),
 
-      biddingStartDate: json["bidding_start_date"] != null
-          ? DateTime.tryParse(json["bidding_start_date"])
-          : null,
+    biddingStartDate: json["bidding_start_date"] != null
+        ? DateTime.tryParse(json["bidding_start_date"])
+        : null,
 
-      biddingEndDate: json["bidding_end_date"] != null
-          ? DateTime.tryParse(json["bidding_end_date"])
-          : null,
+    biddingEndDate: json["bidding_end_date"] != null
+        ? DateTime.tryParse(json["bidding_end_date"])
+        : null,
 
-      listingDate: json["listing_date"] != null
-          ? DateTime.tryParse(json["listing_date"])
-          : null,
+    listingDate: json["listing_date"] != null
+        ? DateTime.tryParse(json["listing_date"])
+        : null,
 
-      lotSize: _toInt(json["lot_size"]),
-      documentUrl: json["document_url"],
-    );
-  }
+    lotSize: _toInt(json["lot_size"]),
+    documentUrl: json["document_url"],
 
+    // 🔥 ADD THESE
+    gmp: json["gmp"],
+    sentiment: json["sentiment"],
+    confidence: json["confidence"],
+  );
+}
+
+
+  // Map<String, dynamic> toJson() => {
+  //   "symbol": symbol,
+  //   "name": name,
+  //   "status": statusValues.reverse[status],
+  //   "is_sme": isSme,
+  //   "additional_text": additionalText,
+  //   "min_price": minPrice,
+  //   "max_price": maxPrice,
+  //   "issue_price": issuePrice,
+  //   "listing_gains": listingGains,
+  //   "listing_price": listingPrice,
+  //   "bidding_start_date": biddingStartDate?.toIso8601String(),
+  //   "bidding_end_date": biddingEndDate?.toIso8601String(),
+  //   "listing_date": listingDate?.toIso8601String(),
+  //   "lot_size": lotSize,
+  //   "document_url": documentUrl,
+  // };
   Map<String, dynamic> toJson() => {
-    "symbol": symbol,
-    "name": name,
-    "status": statusValues.reverse[status],
-    "is_sme": isSme,
-    "additional_text": additionalText,
-    "min_price": minPrice,
-    "max_price": maxPrice,
-    "issue_price": issuePrice,
-    "listing_gains": listingGains,
-    "listing_price": listingPrice,
-    "bidding_start_date": biddingStartDate?.toIso8601String(),
-    "bidding_end_date": biddingEndDate?.toIso8601String(),
-    "listing_date": listingDate?.toIso8601String(),
-    "lot_size": lotSize,
-    "document_url": documentUrl,
-  };
+  "symbol": symbol,
+  "name": name,
+  "status": statusValues.reverse[status],
+  "is_sme": isSme,
+  "additional_text": additionalText,
+  "min_price": minPrice,
+  "max_price": maxPrice,
+  "issue_price": issuePrice,
+  "listing_gains": listingGains,
+  "listing_price": listingPrice,
+  "bidding_start_date": biddingStartDate?.toIso8601String(),
+  "bidding_end_date": biddingEndDate?.toIso8601String(),
+  "listing_date": listingDate?.toIso8601String(),
+  "lot_size": lotSize,
+  "document_url": documentUrl,
+
+  // 🔥 ADD THESE
+  "gmp": gmp,
+  "sentiment": sentiment,
+  "confidence": confidence,
+};
+
 
   IPOModel copyWith({
     String? gmp,
@@ -195,7 +254,10 @@ class IpoAIAnalysis {
 
   factory IpoAIAnalysis.fromJson(Map<String, dynamic> json) {
     return IpoAIAnalysis(
-      gmp: json['gmp'] ?? 'Unknown',
+       gmp: (json['gmp'] == null || json['gmp'] == 'Not available')
+    ? '—'
+    : json['gmp'],
+
       sentiment: json['sentiment'] ?? 'Neutral',
       confidence: json['confidence'] ?? 'Low',
     );

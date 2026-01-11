@@ -3,6 +3,7 @@ import '../../../cache_service/data/repository/cache_service.dart';
 import '../../../home/data/repository/ai_repository.dart';
 import '../../../home/data/repository/news_repository.dart';
 import '../models/ipo_model.dart';
+
 class IpoAiEnrichmentRepository {
   final CacheService _cache = CacheService();
   final NewsRepository _newsRepo = NewsRepository();
@@ -35,13 +36,15 @@ class IpoAiEnrichmentRepository {
       try {
         debugPrint('🤖 Gemini call for ${ipo.name}');
 
-        final newsText =
-            await _newsRepo.fetchIpoNewsText(ipo.name);
+        final newsText = await _newsRepo.fetchIpoNewsText(ipo.name);
 
         final ai = await _geminiRepo.analyzeIpoGmp(
           ipoName: ipo.name,
           newsText: newsText,
         );
+        print('🤖 Gemini call for $newsText');
+        print('📰 News length: ${newsText.length}');
+        print(newsText.substring(0, newsText.length.clamp(0, 500)));
 
         final payload = {
           'gmp': ai.gmp,
@@ -58,8 +61,10 @@ class IpoAiEnrichmentRepository {
             confidence: ai.confidence,
           ),
         );
-      } catch (e) {
-        // graceful fallback
+      } catch (e, st) {
+        debugPrint('❌ AI ERROR for ${ipo.name}');
+        debugPrint(e.toString());
+        debugPrint(st.toString());
         result.add(ipo);
       }
     }
