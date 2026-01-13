@@ -1,66 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/models/trade_model.dart';
+import '../../data/models/trade_setup_model.dart';
 import '../../providers/home_screen_providers.dart';
 import '/config/theme/app_text_theme.dart';
 
 import '/core/extensions/app_extensions.dart';
 import 'package:flutter/material.dart';
-
-// class TopTradesSection extends ConsumerWidget {
-//   const TopTradesSection({super.key});
-
-//   @override
-//   Widget build(BuildContext context, WidgetRef ref) {
-//     final trades = ref.watch(topTradesProvider);
-
-//     return trades.when(
-//       loading: () => Center(child: const CircularProgressIndicator()).py(32),
-//       error: (ob, st) {
-//         print("Top Trade Fetch Error - $ob - $st");
-//         return Text("Error - $ob - $st");
-//       },
-//       data: (data) {
-//         // if (data.isEmpty) {
-//         //   return Padding(
-//         //     padding: const EdgeInsets.all(16),
-//         //     child: Center(
-//         //       child: Text(
-//         //         'No high-probability trade setups today.',
-//         //         style: TextStyle(color: Colors.grey.shade600),
-//         //       ),
-//         //     ),
-//         //   );
-//         // }
-//         return Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             Text("Top Trade Setups", style: AppTextTheme.size20Bold).px(16),
-//             SizedBox(
-//               height: 200,
-//               child: ListView.separated(
-//                 scrollDirection: Axis.horizontal,
-//                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-//                 itemCount: data.length,
-//                 separatorBuilder: (_, __) => const SizedBox(width: 12),
-//                 itemBuilder: (context, index) {
-//                   final trade = data[index];
-//                   return TradeCard(
-//                     stock: trade.symbol,
-//                     score: trade.score,
-//                     horizon: trade.horizon,
-//                     verdict: trade.verdict,
-//                     signals: trade.signals,
-//                   );
-//                 },
-//               ),
-//             ),
-//           ],
-//         );
-//       },
-//     );
-//   }
-// }
 
 class TopTradesSection extends ConsumerWidget {
   const TopTradesSection({super.key});
@@ -85,6 +30,7 @@ class TopTradesSection extends ConsumerWidget {
         final trades = data.isEmpty
             ? [
                 TradeSetup(
+                  name: 'NSE',
                   symbol: 'NIFTY 50',
                   score: 50,
                   horizon: 'Intraday',
@@ -100,7 +46,7 @@ class TopTradesSection extends ConsumerWidget {
             Text("Top Trade Setups", style: AppTextTheme.size20Bold).px(16),
 
             SizedBox(
-              height: 200,
+              height: 240,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(
@@ -112,7 +58,8 @@ class TopTradesSection extends ConsumerWidget {
                 itemBuilder: (context, index) {
                   final trade = trades[index];
                   return TradeCard(
-                    stock: trade.symbol,
+                    stock: trade.name,
+                    stockSymbol: trade.symbol,
                     score: trade.score,
                     horizon: trade.horizon,
                     verdict: trade.verdict,
@@ -130,6 +77,7 @@ class TopTradesSection extends ConsumerWidget {
 
 class TradeCard extends StatelessWidget {
   final String stock;
+  final String stockSymbol;
   final int score;
   final String horizon;
   final TradeVerdict verdict;
@@ -138,6 +86,7 @@ class TradeCard extends StatelessWidget {
   const TradeCard({
     super.key,
     required this.stock,
+    required this.stockSymbol,
     required this.score,
     required this.horizon,
     required this.verdict,
@@ -158,7 +107,7 @@ class TradeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 200,
+      height: 240,
       width: 320,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -173,22 +122,34 @@ class TradeCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
-                child: Text(
-                  stock,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      stock,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      stockSymbol,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
+                  horizontal: 12,
+                  vertical: 5,
                 ),
                 decoration: BoxDecoration(
                   color: Colors.green.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
                   "Score: $score",
@@ -200,12 +161,15 @@ class TradeCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Text("Horizon: $horizon", style: const TextStyle(color: Colors.grey)),
           const SizedBox(height: 8),
-          Text("Signals: $signals"),
+          Text("Signals: $signals", maxLines: 3),
           const SizedBox(height: 6),
-          Text("Verdict: $verdict"),
+          Text(
+            "Verdict: ${verdict.name.toUpperCase()}",
+            style: AppTextTheme.accent16Bold,
+          ),
         ],
       ),
     );

@@ -10,9 +10,11 @@ class IpoAiEnrichmentRepository {
   final GeminiRepository _geminiRepo = GeminiRepository();
 
   static const _gmpPrefix = 'ipo_ai_';
+  final bool ENABLE_IPO_AI = false;
 
   Future<List<IPOModel>> enrichActiveIpos(List<IPOModel> activeIpos) async {
     final List<IPOModel> result = [];
+    if (!ENABLE_IPO_AI) return [];
 
     for (final ipo in activeIpos) {
       final cacheKey = '$_gmpPrefix${ipo.symbol}';
@@ -42,9 +44,10 @@ class IpoAiEnrichmentRepository {
           ipoName: ipo.name,
           newsText: newsText,
         );
-        print('🤖 Gemini call for $newsText');
-        print('📰 News length: ${newsText.length}');
-        print(newsText.substring(0, newsText.length.clamp(0, 500)));
+
+        debugPrint('🤖 Gemini call for $newsText');
+        debugPrint('📰 News length: ${newsText.length}');
+        debugPrint(newsText.substring(0, newsText.length.clamp(0, 500)));
 
         final payload = {
           'gmp': ai.gmp,
@@ -53,14 +56,15 @@ class IpoAiEnrichmentRepository {
         };
 
         _cache.set(cacheKey, payload);
-
-        result.add(
-          ipo.copyWith(
-            gmp: ai.gmp,
-            sentiment: ai.sentiment,
-            confidence: ai.confidence,
-          ),
-        );
+        if (ENABLE_IPO_AI) {
+          result.add(
+            ipo.copyWith(
+              gmp: ai.gmp,
+              sentiment: ai.sentiment,
+              confidence: ai.confidence,
+            ),
+          );
+        }
       } catch (e, st) {
         debugPrint('❌ AI ERROR for ${ipo.name}');
         debugPrint(e.toString());

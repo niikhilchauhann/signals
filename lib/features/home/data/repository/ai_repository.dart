@@ -74,42 +74,6 @@ class GeminiRepository {
         ),
       );
 
-  //   Future<IpoAIAnalysis> analyzeIpoGmp({
-  //     required String ipoName,
-  //     required String newsText,
-  //   }) async {
-
-  //     final prompt =
-  //         '''
-  // You are an IPO market analyst in India.
-
-  // IPO: $ipoName
-
-  // Below is recent IPO news. Extract:
-  // 1. Grey Market Premium (GMP) — numeric value ONLY (example: "+₹11.5" or "41%")
-  // 2. Sentiment (Positive / Neutral / Negative)
-  // 3. Confidence (High / Medium / Low)
-
-  // If multiple GMP values exist, return the MOST RECENT one.
-  // If GMP is not found, return null.
-
-  // Return STRICT JSON ONLY:
-  // {
-  //   "gmp": "+₹11.5",
-  //   "sentiment": "Positive",
-  //   "confidence": "High"
-  // }
-
-  // NEWS:
-  // $newsText
-  // ''';
-
-  //     final response = await _model.generateContent([Content.text(prompt)]);
-  //     final text = response.text ?? '{}';
-
-  //     return IpoAIAnalysis.fromJson(jsonDecode(text));
-  //   }
-
   Future<IpoAIAnalysis> analyzeIpoGmp({
     required String ipoName,
     required String newsText,
@@ -141,11 +105,18 @@ NO markdown.
 NO explanations.
 NO extra text.
 
-If GMP is not explicitly stated, return:
-"gmp": "—"
+If multiple GMP values exist, return the MOST RECENT one.
+If GMP is not explicitly stated, predict it by your own internet search and return in same format:
 
 JSON schema:
 {"gmp":"string","sentiment":"Positive|Neutral|Negative","confidence":"High|Medium|Low"}
+
+e.g.
+   {
+     "gmp": "+₹11.5",
+     "sentiment": "Positive",
+     "confidence": "High"
+   }
 
 IPO: $ipoName
 

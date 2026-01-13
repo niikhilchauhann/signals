@@ -44,7 +44,7 @@ class MarketOverviewCard extends ConsumerWidget {
     return market.when(
       loading: () => Center(child: const CircularProgressIndicator()).py(32),
       error: (ob, st) {
-        print("Error - $ob - $st");
+        debugPrint("Error - $ob - $st");
         return Text("Error - $ob - $st");
       },
       data: (data) {

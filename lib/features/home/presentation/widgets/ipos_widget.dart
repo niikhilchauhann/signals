@@ -22,7 +22,7 @@ class TopIPOsSection extends ConsumerWidget {
     return ipos.when(
       loading: () => Center(child: const CircularProgressIndicator()).py(32),
       error: (ob, st) {
-        print("IPO Fetch Error - $ob - $st");
+        debugPrint("IPO Fetch Error - $ob - $st");
         return Text("Error - $ob - $st");
       },
       data: (data) {

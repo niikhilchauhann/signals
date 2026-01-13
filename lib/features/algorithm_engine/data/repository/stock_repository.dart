@@ -14,16 +14,17 @@ class StockRepository {
   Future<IpoList> fetchAllIpos() async {
     final response = await _client.getRequest('/ipo');
     return IpoList.fromJson(response);
-  } 
-  
+  }
+
   Future<List<NewsArticle>> fetchNews() async {
     final response = await _client.getRequest('/news');
     return newsArticleListFromJson(response);
   }
 
   Future<TrendingStockResponse> fetchTrendingStocks() async {
-    final response = await _client.getRequest('/trending');
-    return trendingStockResponseFromJson(response);
+    final Map<String, dynamic> response = await _client.getRequest('/trending');
+
+    return TrendingStockResponse.fromJson(response);
   }
 
   Future<List<CommodityModel>> fetchCommodities() async {
@@ -36,27 +37,35 @@ class StockRepository {
     return MutualFundResponse.fromJson(response);
   }
 
-   Future<PriceShockerResponse> fetchPriceShockers() async {
-    final response = await _client.getRequest('/price_shockers');
+  Future<PriceShockerResponse> fetchPriceShockers() async {
+    final Map<String, dynamic> response = await _client.getRequest(
+      '/price_shockers',
+    );
+
     return PriceShockerResponse.fromJson(response);
   }
 
   Future<List<StockModel>> fetchBseMostActiveStocks() async {
-    final response = await _client.getRequest('/BSE_most_active');
-    return bseStockListFromJson(response);
+    final List<dynamic> response = await _client.getRequest('/BSE_most_active');
+
+    return response
+        .map((e) => StockModel.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
-   Future<List<StockModel>> fetchNseMostActiveStocks() async {
-    final response = await _client.getRequest('/NSE_most_active');
-    return nseStockListFromJson(response);
+  Future<List<StockModel>> fetchNseMostActiveStocks() async {
+    final List<dynamic> response = await _client.getRequest('/NSE_most_active');
+
+    return response
+        .map((e) => StockModel.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
-   Future<Week52Response> fetchWeek52Data() async {
-    final response = await _client.getRequest('/fetch_52_week_high_low_data');
+  Future<Week52Response> fetchWeek52Data() async {
+    final Map<String, dynamic> response = await _client.getRequest(
+      '/fetch_52_week_high_low_data',
+    );
+
     return Week52Response.fromJson(response);
   }
-
-  
 }
-
-

@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/models/market_overview.dart';
-import '../data/models/trade_model.dart';
-import '../data/repository/market_repository.dart';
-import '../data/repository/trade_repository.dart';
+import '../data/models/trade_setup_model.dart';
+import '../data/repository/market_overview_repository.dart';
+import '../data/repository/trade_setup_repository.dart';
 
 final marketRepositoryProvider = Provider(
   (ref) => MarketRepository(),

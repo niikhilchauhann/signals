@@ -18,3 +18,19 @@ Watchlist
 
 ToDo:
 IndianAPI is inconsistent in providing some data like IPO data; sends double, int, null which causes hurdle in developments.
+
+IMPORTANT TRUTH (PLEASE READ)
+
+Yahoo Finance is NOT a reliable India-wide engine.
+
+Out of ~200 “most active” stocks:
+
+~40–50% are not analyzable
+
+~20% miss OHLC randomly
+
+Only ~30% are usable consistently
+
+Your pipeline MUST be lossy.
+
+And now it is
