@@ -54,7 +54,7 @@ class TopTradesSection extends ConsumerWidget {
                   horizontal: 16,
                   vertical: 16,
                 ),
-                itemCount: trades.length, // ✅ FIXED
+                itemCount: trades.length,
                 separatorBuilder: (_, __) => const SizedBox(width: 12),
                 itemBuilder: (context, index) {
                   final trade = trades[index];
