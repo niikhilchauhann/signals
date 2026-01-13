@@ -10,7 +10,7 @@ class IpoAiEnrichmentRepository {
   final GeminiRepository _geminiRepo = GeminiRepository();
 
   static const _gmpPrefix = 'ipo_ai_';
-  final bool ENABLE_IPO_AI = false;
+  final bool ENABLE_IPO_AI = true;
 
   Future<List<IPOModel>> enrichActiveIpos(List<IPOModel> activeIpos) async {
     final List<IPOModel> result = [];
@@ -56,15 +56,13 @@ class IpoAiEnrichmentRepository {
         };
 
         _cache.set(cacheKey, payload);
-        if (ENABLE_IPO_AI) {
-          result.add(
-            ipo.copyWith(
-              gmp: ai.gmp,
-              sentiment: ai.sentiment,
-              confidence: ai.confidence,
-            ),
-          );
-        }
+        result.add(
+          ipo.copyWith(
+            gmp: ai.gmp,
+            sentiment: ai.sentiment,
+            confidence: ai.confidence,
+          ),
+        );
       } catch (e, st) {
         debugPrint('❌ AI ERROR for ${ipo.name}');
         debugPrint(e.toString());
