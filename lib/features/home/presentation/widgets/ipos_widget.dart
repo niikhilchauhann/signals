@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../algorithm_engine/data/providers/other_assets_provider.dart';
 import '../../providers/home_screen_providers.dart';
 import '/config/theme/app_text_theme.dart';
+import '/config/theme/app_colors.dart';
 
 import '/core/extensions/app_extensions.dart';
 import 'package:flutter/material.dart';
@@ -29,42 +30,52 @@ class TopIPOsSection extends ConsumerWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: const Text(
-                    "Top IPOs",
-                    style: AppTextTheme.size20Bold,
-                  ).px(16),
-                ),
-
-                CustomTextButton(
-                  ontap: () async {
-                    refresh();
-                    // await ref.read(ipoWithGmpProvider.future);
-                  },
-                  title: 'Refresh',
-                ),
-                12.widthBox,
-                CustomTextButton(
-                  ontap: () async {
-                    Navigator.push(
-                      context,
-                      CupertinoPageRoute(
-                        builder: (context) => const IpoScreen(),
-                      ),
-                    );
-                  },
-                  title: 'See All',
-                ),
-                16.widthBox,
-              ],
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        Text("Top IPOs", style: AppTextTheme.size20Bold),
+                        SizedBox(height: 2),
+                        Text(
+                          "Fresh listings with live GMP and sentiment",
+                          style: AppTextTheme.size14Normal,
+                        ),
+                      ],
+                    ),
+                  ),
+                  CustomTextButton(
+                    ontap: () async {
+                      refresh();
+                    },
+                    title: 'Refresh',
+                  ),
+                  12.widthBox,
+                  CustomTextButton(
+                    ontap: () async {
+                      Navigator.push(
+                        context,
+                        CupertinoPageRoute(
+                          builder: (context) => const IpoScreen(),
+                        ),
+                      );
+                    },
+                    title: 'See All',
+                  ),
+                ],
+              ),
             ),
             SizedBox(
-              height: 245,
+              height: 235,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
                 itemCount: data.length,
                 separatorBuilder: (_, __) => const SizedBox(width: 12),
                 itemBuilder: (context, index) {
@@ -89,22 +100,53 @@ class IpoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 280,
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: const [BoxShadow(blurRadius: 8, color: Colors.black12)],
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFFFFFF), Color(0xFFF3F6FF)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE7E9F5)),
+        boxShadow: const [BoxShadow(blurRadius: 12, color: Colors.black12)],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            ipo.name,
-            maxLines: 2,
-            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Text(
+                  ipo.name,
+                  maxLines: 2,
+                  style: AppTextTheme.size18Bold,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color:
+                      (ipo.isSme ? AppColors.hotPink : AppColors.primaryPurple)
+                          .withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  ipo.isSme ? 'SME' : 'Mainboard',
+                  style: AppTextTheme.accent12Bold.copyWith(
+                    color: ipo.isSme
+                        ? AppColors.hotPink
+                        : AppColors.primaryPurple,
+                  ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
-          IPORow(label: "Type", value: ipo.isSme ? 'SME' : 'Mainboard'),
+          const SizedBox(height: 12),
           IPORow(
             label: "End Date",
             value: ipo.biddingEndDate.toString().split(' ').first,
@@ -131,19 +173,18 @@ class IPORow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Label (fixed)
-          Text(label, style: const TextStyle(color: Colors.grey)),
-
+          Text(
+            label,
+            style: AppTextTheme.size12Normal.copyWith(color: AppColors.grey),
+          ),
           const SizedBox(width: 8),
-
-          // Value (flexible)
           Expanded(
             child: Text(
               value,
               textAlign: TextAlign.right,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+              style: AppTextTheme.size14Bold,
             ),
           ),
         ],
