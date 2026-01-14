@@ -34,7 +34,8 @@ class _AppStructureState extends State<AppStructure> {
           height: 75,
           child: CustomNavigationBar(
             currentIndex: value,
-            onTap: (index) => setState(() => _currentIndex.value = index),
+            onTap: (index) =>
+                setState(() => index != 2 ? _currentIndex.value = index : null),
             backgroundColor: AppColors.white,
             selectedColor: AppColors.black,
             unSelectedColor: AppColors.black.withValues(alpha: 0.5),

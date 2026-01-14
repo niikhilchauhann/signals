@@ -1,10 +1,12 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '/core/export.dart';
 import '../algorithm_engine/data/models/uni_stock_model.dart';
 import '../algorithm_engine/data/providers/stock_lists_provider.dart';
-import 'watchlist_provider.dart';
+import 'domain/repository/watchlist_provider.dart';
 
 // Chip options
 enum ChipSource {
@@ -241,11 +243,15 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
         );
 
         for (final symbol in watchlist) {
-          final match = nseList.firstWhere(
-            (x) => x.tickerId == symbol,
-            orElse: () => bseList.firstWhere(
-              (x) => x.tickerId == symbol,
-              orElse: () => StockModel(
+          StockModel match;
+
+          try {
+            match = nseList.firstWhere((x) => x.tickerId == symbol);
+          } catch (_) {
+            try {
+              match = bseList.firstWhere((x) => x.tickerId == symbol);
+            } catch (_) {
+              match = StockModel(
                 tickerId: symbol,
                 companyName: symbol,
                 price: '',
@@ -265,9 +271,10 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
                 longTermTrends: '',
                 yearLow: '',
                 yearHigh: '',
-              ),
-            ),
-          );
+              );
+            }
+          }
+
           mapped.add(match);
         }
         visible = mapped;
@@ -379,9 +386,7 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
                           final inWatch = ref
                               .watch(watchlistProvider)
                               .contains(st.tickerId);
-                          final chgText = st.percentChange.isNotEmpty
-                              ? st.percentChange
-                              : st.netChange;
+                          final chgText = st.percentChange;
 
                           double? pct;
                           try {
@@ -618,29 +623,29 @@ class _StockCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Text(stock.tickerId, style: AppTextTheme.size18Bold),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFEFF2FB),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        stock.companyName,
-                        style: AppTextTheme.size12Normal.copyWith(
-                          color: AppColors.darkGrey,
-                        ),
-                      ),
-                    ),
-                  ],
+                Text(
+                  stock.companyName,
+                  style: AppTextTheme.size18Bold,
+                  maxLines: 2,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEFF2FB),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    stock.tickerId,
+                    style: AppTextTheme.size12Normal.copyWith(
+                      color: AppColors.darkGrey,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
                 Row(
                   children: [
                     _Pill(label: 'High', value: stock.high),
@@ -657,22 +662,25 @@ class _StockCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                stock.price.isNotEmpty ? stock.price : '-',
+                '₹${stock.price.isNotEmpty ? stock.price : '-'}',
                 style: AppTextTheme.size18Bold,
               ),
               const SizedBox(height: 6),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
                 decoration: BoxDecoration(
                   color: changeColor.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  changeText.isNotEmpty ? changeText : '-',
+                  '± ${changeText.isNotEmpty ? changeText : 'NA'}%',
                   style: AppTextTheme.size12Bold.copyWith(color: changeColor),
                 ),
               ),
-              const SizedBox(height: 12),
+              // const SizedBox(height: 12),
               IconButton(
                 icon: Icon(
                   inWatchlist ? Icons.check_circle : Icons.add_circle_outline,
@@ -696,7 +704,7 @@ class _Pill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final display = (value.isNotEmpty) ? value : '—';
+    final display = (value.isNotEmpty) ? value : 'NA';
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
       decoration: BoxDecoration(
