@@ -2,6 +2,18 @@
 
 Flutter
 
+## UI/UX Design
+Below are the images showcasing the UI/UX design of Envy Music:
+
+<table>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/f952de47-eeea-456e-903e-5ed3ec9f19d0" alt="UI Screenshot 1" width="200"/></td>
+    <td><img src="https://github.com/user-attachments/assets/75789af8-bed2-4f32-9f3d-3e886956bb55" alt="UI Screenshot 2" width="200"/></td>
+    <td><img src="https://github.com/user-attachments/assets/94a2b245-d943-45e7-9bfa-897ea5c0d462" alt="UI Screenshot 3" width="200"/></td>
+    <td><img src="https://github.com/user-attachments/assets/b5c36ffd-2a1a-4cc0-a5bc-c4ab3b07a24e" alt="UI Screenshot 4" width="200"/></td>
+  </tr>
+</table>
+
 #Features:
 trading app with ipo,
 bullish signals for stocks,
