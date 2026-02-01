@@ -14,11 +14,11 @@ void main() async {
   } catch (e) {
     throw Exception('Error loading .env file: $e');
   }
-  await CacheService.init();
   await Hive.initFlutter();
   await Hive.openBox('cache');
 
   await Hive.openBox<List>('watchlist_box');
+  await CacheService.init();
   // await Supabase.initialize(
   //   url: dotenv.env['SUPABASE_URL'] ?? '',
   //   anonKey:  dotenv.env['ANON_KEY'] ?? '',
