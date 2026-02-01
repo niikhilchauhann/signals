@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import '../../../algorithm_engine/data/models/stock_lists_model.dart';
 import '../../../algorithm_engine/data/models/uni_stock_model.dart';
 import '../../../algorithm_engine/data/repository/stock_repository.dart';
 // import '../models/trade_analyzer.dart';
@@ -264,52 +265,40 @@ class TradeRepository {
   Future<List<TradeSetup>> fetchTopTrades() async {
     final Map<String, TradeSetup> sets = {};
 
-    // Future<void> collectStocks(List<StockModel> list) async {
-    //   print(list);
-
-    //   for (final s in list) {
-    //     final yahooSymbol = normalizeYahooSymbol(s.tickerId);
-    //     if (yahooSymbol == null) continue;
-
-    //     try {
-    //       final trade = await _analyzeStock(yahooSymbol);
-    //       if (trade == null) continue;
-    //       sets[trade.symbol] = trade;
-    //     } catch (e, st) {
-    //       print(e);
-    //       print(st);
-    //     }
-    //   }
-    // }
     Future<void> collectStocks(List<StockModel> list) async {
-      for (final s in list) {
+      for (final s in list.take(10)) {
         final yahooSymbol = normalizeYahooSymbol(s.tickerId);
 
-        // 1️⃣ Try Yahoo if symbol is valid
         if (yahooSymbol != null) {
           try {
             final trade = await _analyzeStock(yahooSymbol, s.companyName);
             if (trade != null) {
               sets[trade.symbol] = trade;
-              continue; // ✅ Yahoo success, skip fallback
+              continue;
             }
           } catch (e, st) {
             debugPrint(e.toString());
             debugPrint(st.toString());
-
-            // fall through to fallback
           }
         }
 
-        // 2️⃣ Fallback to IndianAPI snapshot analysis
         final fallback = _fallbackIndianApiAnalysis(s);
         sets[fallback.symbol] = fallback;
       }
     }
 
-    await collectStocks(
-      (await _marketRepo.fetchTrendingStocks()).trendingStocks.topGainers,
-    );
+    TrendingStockResponse? trending;
+
+    try {
+      trending = await _marketRepo.fetchTrendingStocks();
+    } catch (e) {
+      debugPrint('⚠️ Trending skipped: $e');
+    }
+
+    if (trending != null) {
+      await collectStocks(trending.trendingStocks.topGainers);
+    }
+
     await collectStocks(await _marketRepo.fetchNseMostActiveStocks());
     await collectStocks(await _marketRepo.fetchBseMostActiveStocks());
 

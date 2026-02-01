@@ -577,7 +577,8 @@ String _priceBand(IPOModel item) {
   if (item.minPrice != null && item.maxPrice != null) {
     return '${item.minPrice!.toStringAsFixed(0)} - ${item.maxPrice!.toStringAsFixed(0)}';
   }
-  if (item.issuePrice != null)
+  if (item.issuePrice != null) {
     return 'Rs ${item.issuePrice!.toStringAsFixed(0)}';
+  }
   return '—';
 }
