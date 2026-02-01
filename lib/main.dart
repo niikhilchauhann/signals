@@ -5,6 +5,7 @@ import 'package:hive_flutter/adapters.dart';
 
 import 'config/api/network_provider.dart';
 import 'core/export.dart';
+import 'features/cache_service/data/repository/cache_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,6 +14,7 @@ void main() async {
   } catch (e) {
     throw Exception('Error loading .env file: $e');
   }
+  await CacheService.init();
   await Hive.initFlutter();
   await Hive.openBox('cache');
 

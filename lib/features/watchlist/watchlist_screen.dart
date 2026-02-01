@@ -46,6 +46,40 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
         return 'Price Shockers';
     }
   }
+// inside _WatchlistScreenState:
+
+Future<void> _refreshVisibleSource() async {
+  try {
+    switch (_selected) {
+      case ChipSource.trending:
+        ref.refresh(trendingStockProvider);
+        await ref.read(trendingStockProvider.future);
+        break;
+      case ChipSource.nseActive:
+        ref.refresh(nseMostActiveProvider);
+        await ref.read(nseMostActiveProvider.future);
+        break;
+      case ChipSource.bseActive:
+        ref.refresh(bseMostActiveProvider);
+        await ref.read(bseMostActiveProvider.future);
+        break;
+      case ChipSource.week52:
+        ref.refresh(week52Provider);
+        await ref.read(week52Provider.future);
+        break;
+      case ChipSource.priceShockers:
+        ref.refresh(priceShockerProvider);
+        await ref.read(priceShockerProvider.future);
+        break;
+      case ChipSource.watchlist:
+      default:
+        // watchlist is local box data; nothing to refresh remotely
+        break;
+    }
+  } catch (e) {
+    // swallow (UI can show toast/snackbar)
+  }
+}
 
   // unify a StockModel list from all providers (some providers return wrapper types)
   List<StockModel> _extractFromTrending(AsyncValue trending) {
@@ -370,18 +404,18 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
                 }),
               ),
               Expanded(
-                child: isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : filtered.isEmpty
-                    ? _EmptyState(
-                        isWatchlist: _selected == ChipSource.watchlist,
-                      )
-                    : ListView.separated(
-                        padding: const EdgeInsets.fromLTRB(16, 10, 16, 18),
-                        itemCount: filtered.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 12),
-                        itemBuilder: (context, index) {
-                          final st = filtered[index];
+  child: isLoading
+      ? const Center(child: CircularProgressIndicator())
+      : RefreshIndicator(
+          onRefresh: _refreshVisibleSource,
+          child: filtered.isEmpty
+              ? _EmptyState(isWatchlist: _selected == ChipSource.watchlist)
+              : ListView.separated(
+                  padding: const EdgeInsets.fromLTRB(16, 10, 16, 18),
+                  itemCount: filtered.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 12),
+                  itemBuilder: (context, index) {
+                   final st = filtered[index];
                           final inWatch = ref
                               .watch(watchlistProvider)
                               .contains(st.tickerId);
@@ -420,9 +454,64 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
                               }
                             },
                           );
-                        },
-                      ),
-              ),
+                  },
+                ),
+        ),
+),
+              // Expanded(
+              //   child: isLoading
+              //       ? const Center(child: CircularProgressIndicator())
+              //       : filtered.isEmpty
+              //       ? _EmptyState(
+              //           isWatchlist: _selected == ChipSource.watchlist,
+              //         )
+              //       : ListView.separated(
+              //           padding: const EdgeInsets.fromLTRB(16, 10, 16, 18),
+              //           itemCount: filtered.length,
+              //           separatorBuilder: (_, __) => const SizedBox(height: 12),
+              //           itemBuilder: (context, index) {
+              //             final st = filtered[index];
+              //             final inWatch = ref
+              //                 .watch(watchlistProvider)
+              //                 .contains(st.tickerId);
+              //             final chgText = st.percentChange;
+
+              //             double? pct;
+              //             try {
+              //               pct =
+              //                   double.tryParse(
+              //                     st.percentChange.replaceAll('%', ''),
+              //                   ) ??
+              //                   double.tryParse(
+              //                     st.netChange.replaceAll('%', ''),
+              //                   );
+              //             } catch (_) {
+              //               pct = null;
+              //             }
+
+              //             final Color pctColor = (pct != null && pct < 0)
+              //                 ? AppColors.redLight
+              //                 : AppColors.green;
+
+              //             return _StockCard(
+              //               stock: st,
+              //               changeText: chgText,
+              //               changeColor: pctColor,
+              //               inWatchlist: inWatch,
+              //               onToggleWatch: () async {
+              //                 final notifier = ref.read(
+              //                   watchlistProvider.notifier,
+              //                 );
+              //                 if (inWatch) {
+              //                   await notifier.remove(st.tickerId);
+              //                 } else {
+              //                   await notifier.add(st.tickerId);
+              //                 }
+              //               },
+              //             );
+              //           },
+              //         ),
+              // ),
             ],
           ),
         ),
