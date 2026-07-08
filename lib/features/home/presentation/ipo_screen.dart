@@ -535,14 +535,13 @@ class _SentimentPill extends StatelessWidget {
 
 Color _statusColor(Status status) {
   switch (status) {
-    case Status.ACTIVE:
+    case Status.active:
       return AppColors.green;
-    case Status.LISTED:
+    case Status.listed:
       return AppColors.secondaryViolet;
-    case Status.CLOSED:
+    case Status.closed:
       return AppColors.grey;
-    case Status.UPCOMING:
-    default:
+    case Status.upcoming:
       return AppColors.primaryPurple;
   }
 }

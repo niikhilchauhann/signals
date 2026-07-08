@@ -88,10 +88,10 @@ class IpoAiEnrichmentRepository {
 
   static const _gmpPrefix = 'ipo_ai_';
   static const Duration _ttl = Duration(hours: 12);
-  final bool ENABLE_IPO_AI = true;
+  final bool enableIpoAi = true;
 
   Future<List<IPOModel>> enrichActiveIpos(List<IPOModel> activeIpos) async {
-    if (!ENABLE_IPO_AI) return activeIpos;
+    if (!enableIpoAi) return activeIpos;
 
     final List<IPOModel> result = [];
 

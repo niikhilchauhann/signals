@@ -48,30 +48,30 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
   // inside _WatchlistScreenState:
 
   Future<void> _refreshVisibleSource() async {
+    final repo = ref.read(stockRepositoryProvider);
     try {
       switch (_selected) {
         case ChipSource.trending:
-          ref.refresh(trendingStockProvider);
-          await ref.read(trendingStockProvider.future);
+          await repo.fetchTrendingStocks(forceRefresh: true);
+          ref.invalidate(trendingStockProvider);
           break;
         case ChipSource.nseActive:
-          ref.refresh(nseMostActiveProvider);
-          await ref.read(nseMostActiveProvider.future);
+          await repo.fetchNseMostActiveStocks(forceRefresh: true);
+          ref.invalidate(nseMostActiveProvider);
           break;
         case ChipSource.bseActive:
-          ref.refresh(bseMostActiveProvider);
-          await ref.read(bseMostActiveProvider.future);
+          await repo.fetchBseMostActiveStocks(forceRefresh: true);
+          ref.invalidate(bseMostActiveProvider);
           break;
         case ChipSource.week52:
-          ref.refresh(week52Provider);
-          await ref.read(week52Provider.future);
+          await repo.fetchWeek52Data(forceRefresh: true);
+          ref.invalidate(week52Provider);
           break;
         case ChipSource.priceShockers:
-          ref.refresh(priceShockerProvider);
-          await ref.read(priceShockerProvider.future);
+          await repo.fetchPriceShockers(forceRefresh: true);
+          ref.invalidate(priceShockerProvider);
           break;
         case ChipSource.watchlist:
-        default:
           // watchlist is local box data; nothing to refresh remotely
           break;
       }
@@ -371,7 +371,6 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
         case ChipSource.priceShockers:
           return priceShockers.isLoading;
         case ChipSource.watchlist:
-        default:
           return false;
       }
     }();

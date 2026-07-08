@@ -139,7 +139,7 @@ class IPOModel {
   return IPOModel(
     symbol: json["symbol"] ?? "",
     name: json["name"] ?? "",
-    status: statusValues.map[json["status"]] ?? Status.UPCOMING,
+    status: statusValues.map[json["status"]] ?? Status.upcoming,
     isSme: json["is_sme"] ?? false,
     additionalText: json["additional_text"] ?? "",
 
@@ -264,28 +264,28 @@ class IpoAIAnalysis {
   }
 }
 
-enum Status { ACTIVE, CLOSED, LISTED, UPCOMING }
+enum Status { active, closed, listed, upcoming }
 
 extension StatusX on Status {
   String get label {
     switch (this) {
-      case Status.ACTIVE:
+      case Status.active:
         return 'ACTIVE';
-      case Status.CLOSED:
+      case Status.closed:
         return 'CLOSED';
-      case Status.LISTED:
+      case Status.listed:
         return 'LISTED';
-      case Status.UPCOMING:
+      case Status.upcoming:
         return 'UPCOMING';
     }
   }
 }
 
 final statusValues = EnumValues({
-  "active": Status.ACTIVE,
-  "closed": Status.CLOSED,
-  "listed": Status.LISTED,
-  "upcoming": Status.UPCOMING,
+  "active": Status.active,
+  "closed": Status.closed,
+  "listed": Status.listed,
+  "upcoming": Status.upcoming,
 });
 
 class EnumValues<T> {
