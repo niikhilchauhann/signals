@@ -132,7 +132,7 @@ class IpoCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color:
                       (ipo.isSme ? AppColors.hotPink : AppColors.primaryPurple)
-                          .withOpacity(0.12),
+                          .withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(

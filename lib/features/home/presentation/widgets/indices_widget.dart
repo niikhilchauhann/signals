@@ -67,9 +67,9 @@ class MarketOverviewCard extends ConsumerWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                biasColor.withOpacity(0.95),
-                biasColor.withOpacity(0.85),
-                biasColor.withOpacity(0.70),
+                biasColor.withValues(alpha: 0.95),
+                biasColor.withValues(alpha: 0.85),
+                biasColor.withValues(alpha: 0.70),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -94,7 +94,7 @@ class MarketOverviewCard extends ConsumerWidget {
                       vertical: 8,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.16),
+                      color: Colors.white.withValues(alpha: 0.16),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -129,7 +129,7 @@ class MarketOverviewCard extends ConsumerWidget {
               Text(
                 'Key intraday levels to guide your entries and exits.',
                 style: AppTextTheme.size14Normal.copyWith(
-                  color: Colors.white.withOpacity(0.85),
+                  color: Colors.white.withValues(alpha: 0.85),
                 ),
               ),
               const SizedBox(height: 18),
@@ -187,7 +187,7 @@ class _MetricPill extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white24),
       ),
@@ -198,7 +198,7 @@ class _MetricPill extends StatelessWidget {
           Text(
             label,
             style: AppTextTheme.size12Normal.copyWith(
-              color: Colors.white.withOpacity(0.85),
+              color: Colors.white.withValues(alpha: 0.85),
             ),
           ),
           const SizedBox(height: 6),
@@ -223,7 +223,7 @@ class _NoteCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.16),
+        color: Colors.white.withValues(alpha: 0.16),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.white24),
       ),
@@ -236,7 +236,7 @@ class _NoteCard extends StatelessWidget {
             child: Text(
               note,
               style: AppTextTheme.size14Normal.copyWith(
-                color: Colors.white.withOpacity(0.9),
+                color: Colors.white.withValues(alpha: 0.9),
               ),
             ),
           ),
