@@ -66,12 +66,20 @@ class CacheService {
     await _box!.put(_key(name), payload);
   }
 
-  /// Returns data if available and not deserialized; returns null if not present.
   static dynamic get(String name) {
     _box ??= Hive.box<Map>(_boxName);
     final raw = _box!.get(_key(name));
     if (raw == null) return null;
-    return raw[_dataField];
+    return _castData(raw[_dataField]);
+  }
+
+  static dynamic _castData(dynamic data) {
+    if (data is Map) {
+      return data.map<String, dynamic>((key, value) => MapEntry(key.toString(), _castData(value)));
+    } else if (data is List) {
+      return data.map((e) => _castData(e)).toList();
+    }
+    return data;
   }
 
   /// Return cached payload and timestamp map for advanced handling

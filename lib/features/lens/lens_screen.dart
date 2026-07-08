@@ -23,6 +23,12 @@ class _LensScreenState extends State<LensScreen>
     super.initState();
   }
 
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   File? _image;
   bool _loading = false;
   String _result = '';
@@ -59,7 +65,7 @@ class _LensScreenState extends State<LensScreen>
 
       final response = await http.post(
         Uri.parse(
-          "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent?key=$geminiApiKey",
+          "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=$geminiApiKey",
         ),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
