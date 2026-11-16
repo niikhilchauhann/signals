@@ -10,6 +10,9 @@ class TradeSetup {
   final String signals;
   final TradeVerdict verdict;
   final TradeSource source;
+  final double? entry;
+  final double? target;
+  final double? stopLoss;
 
   TradeSetup({
     required this.name,
@@ -19,5 +22,8 @@ class TradeSetup {
     required this.signals,
     required this.verdict,
     this.source = TradeSource.technical,
+    this.entry,
+    this.target,
+    this.stopLoss,
   });
 }

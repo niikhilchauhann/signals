@@ -1,11 +1,12 @@
+import 'dart:math';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/trade_setup_model.dart';
 import '../../providers/home_screen_providers.dart';
-import '/config/theme/app_text_theme.dart';
-import '/config/theme/app_colors.dart';
-
-import '/core/extensions/app_extensions.dart';
+import '../all_trades_screen.dart';
+import '/core/export.dart';
 import 'package:flutter/material.dart';
 
 class TopTradesSection extends ConsumerWidget {
@@ -20,14 +21,10 @@ class TopTradesSection extends ConsumerWidget {
 
       error: (ob, st) {
         debugPrint("Top Trade Fetch Error - $ob\n$st");
-        return const Padding(
-          padding: EdgeInsets.all(16),
-          child: Text("Failed to load trade setups"),
-        );
+        return const SizedBox.shrink();
       },
 
       data: (data) {
-        // 🔥 HARD GUARANTEE: never empty UI
         final trades = data.isEmpty
             ? [
                 TradeSetup(
@@ -41,34 +38,69 @@ class TopTradesSection extends ConsumerWidget {
               ]
             : data;
 
+        // Sort by score descending and take top 3
+        final sorted = List<TradeSetup>.from(trades)
+          ..sort((a, b) => b.score.compareTo(a.score));
+        final displayList = sorted.sublist(0, min(3, sorted.length));
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Top Trade Setups", style: AppTextTheme.size20Bold).px(16),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenPadding,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Top Trade Setups", style: AppTextTheme.size20Bold),
+                  const SizedBox(height: 2),
+                  Text(
+                    "Highest-confidence signals for today",
+                    style: AppTextTheme.size14Normal.copyWith(
+                      color: AppColors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.itemGap),
 
-            SizedBox(
-              height: 300,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 16,
-                ),
-                itemCount: trades.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 12),
-                itemBuilder: (context, index) {
-                  final trade = trades[index];
-                  return TradeCard(
-                    stock: trade.name,
-                    stockSymbol: trade.symbol,
-                    score: trade.score,
-                    horizon: trade.horizon,
-                    verdict: trade.verdict,
-                    signals: trade.signals,
+            // Trade cards — vertical list
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenPadding,
+              ),
+              child: Column(
+                children: displayList
+                    .map((trade) => Padding(
+                          padding: const EdgeInsets.only(
+                            bottom: AppSpacing.itemGap,
+                          ),
+                          child: TradeCard(trade: trade),
+                        ))
+                    .toList(),
+              ),
+            ),
+
+            // See All button
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenPadding,
+              ),
+              child: _SeeAllButton(
+                label: 'See All Trade Setups',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    CupertinoPageRoute(
+                      builder: (context) => const AllTradesScreen(),
+                    ),
                   );
                 },
               ),
             ),
+            const SizedBox(height: AppSpacing.sectionGap),
           ],
         );
       },
@@ -77,56 +109,44 @@ class TopTradesSection extends ConsumerWidget {
 }
 
 class TradeCard extends StatelessWidget {
-  final String stock;
-  final String stockSymbol;
-  final int score;
-  final String horizon;
-  final TradeVerdict verdict;
-  final String signals;
+  final TradeSetup trade;
 
-  const TradeCard({
-    super.key,
-    required this.stock,
-    required this.stockSymbol,
-    required this.score,
-    required this.horizon,
-    required this.verdict,
-    required this.signals,
-  });
+  const TradeCard({super.key, required this.trade});
 
-  Color verdictColor(TradeVerdict v) {
+  Color _verdictColor(TradeVerdict v) {
     switch (v) {
       case TradeVerdict.buy:
-        return Colors.green;
+        return AppColors.green;
       case TradeVerdict.watch:
-        return Colors.orange;
+        return AppColors.yellow;
       case TradeVerdict.avoid:
-        return Colors.red;
+        return AppColors.redLight;
+    }
+  }
+
+  IconData _verdictIcon(TradeVerdict v) {
+    switch (v) {
+      case TradeVerdict.buy:
+        return Icons.trending_up_rounded;
+      case TradeVerdict.watch:
+        return Icons.remove_red_eye_outlined;
+      case TradeVerdict.avoid:
+        return Icons.block_rounded;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final color = verdictColor(verdict);
-    final double progress = (score.clamp(0, 100) / 100).toDouble();
+    final color = _verdictColor(trade.verdict);
+    final double progress = (trade.score.clamp(0, 100) / 100).toDouble();
 
     return Container(
-      height: 240,
-      width: 320,
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFFFFFFF), Color(0xFFF2F6FF)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE6E9F5)),
-        boxShadow: const [BoxShadow(blurRadius: 12, color: Colors.black12)],
-      ),
+      padding: const EdgeInsets.all(AppSpacing.cardPadding),
+      decoration: AppDecorations.card(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header: name + verdict chip
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -134,77 +154,112 @@ class TradeCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(stock, style: AppTextTheme.size18Bold),
+                    Text(trade.name, style: AppTextTheme.size18Bold),
                     const SizedBox(height: 4),
                     Text(
-                      stockSymbol,
-                      style: AppTextTheme.size14Bold.copyWith(
+                      trade.symbol,
+                      style: AppTextTheme.size14Normal.copyWith(
                         color: AppColors.grey,
                       ),
                     ),
                   ],
                 ),
               ),
-              _VerdictChip(verdict: verdict, color: color),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                decoration: AppDecorations.chip(color: color),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(_verdictIcon(trade.verdict), size: 14, color: color),
+                    const SizedBox(width: 4),
+                    Text(
+                      trade.verdict.name.toUpperCase(),
+                      style: AppTextTheme.size12Bold.copyWith(color: color),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: AppSpacing.itemGap),
+
+          // Tags row: horizon + confidence
           Row(
             children: [
-              _Tag(label: horizon, icon: Icons.schedule_rounded),
-              const SizedBox(width: 8),
-              _Tag(label: 'Score $score', icon: Icons.bolt_rounded),
+              _Tag(label: trade.horizon, icon: Icons.schedule_rounded),
+              const SizedBox(width: AppSpacing.innerGap),
+              _Tag(
+                label: 'Confidence ${trade.score}%',
+                icon: Icons.bolt_rounded,
+              ),
             ],
           ),
-          const SizedBox(height: 12),
-          LinearProgressIndicator(
-            value: progress,
-            backgroundColor: const Color(0xFFE4E7F2),
-            valueColor: AlwaysStoppedAnimation<Color>(color),
-            minHeight: 6,
+          const SizedBox(height: AppSpacing.itemGap),
+
+          // Confidence bar
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: progress,
+              backgroundColor: AppColors.chipBackground,
+              valueColor: AlwaysStoppedAnimation<Color>(color),
+              minHeight: 4,
+            ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.itemGap),
+
+          // Signals text
           Text(
-            signals,
-            maxLines: 3,
+            trade.signals,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: AppTextTheme.size14Normal,
+            style: AppTextTheme.size14Normal.copyWith(
+              color: AppColors.darkGrey,
+            ),
           ),
-          const Spacer(),
-          Text(
-            "Verdict: ${verdict.name.toUpperCase()}",
-            style: AppTextTheme.accent16Bold.copyWith(color: color),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
-class _VerdictChip extends StatelessWidget {
-  final TradeVerdict verdict;
-  final Color color;
-
-  const _VerdictChip({required this.verdict, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha: 0.25)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.check_circle, size: 16, color: color),
-          const SizedBox(width: 6),
-          Text(
-            verdict.name.toUpperCase(),
-            style: AppTextTheme.size12Bold.copyWith(color: color),
-          ),
+          // Entry / Target / Stop Loss row
+          if (trade.entry != null ||
+              trade.target != null ||
+              trade.stopLoss != null) ...[
+            const SizedBox(height: AppSpacing.itemGap),
+            Row(
+              children: [
+                if (trade.entry != null)
+                  Expanded(
+                    child: _LevelPill(
+                      label: 'Entry',
+                      value: '₹${trade.entry!.toStringAsFixed(0)}',
+                      color: AppColors.primaryPurple,
+                    ),
+                  ),
+                if (trade.target != null) ...[
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: _LevelPill(
+                      label: 'Target',
+                      value: '₹${trade.target!.toStringAsFixed(0)}',
+                      color: AppColors.green,
+                    ),
+                  ),
+                ],
+                if (trade.stopLoss != null) ...[
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: _LevelPill(
+                      label: 'SL',
+                      value: '₹${trade.stopLoss!.toStringAsFixed(0)}',
+                      color: AppColors.redLight,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -221,10 +276,7 @@ class _Tag extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: const Color(0xFFEFF2FB),
-        borderRadius: BorderRadius.circular(10),
-      ),
+      decoration: AppDecorations.metricPill(),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -237,6 +289,86 @@ class _Tag extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _LevelPill extends StatelessWidget {
+  final String label;
+  final String value;
+  final Color color;
+
+  const _LevelPill({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+        border: Border.all(color: color.withValues(alpha: 0.15)),
+      ),
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: AppTextTheme.size10Normal.copyWith(
+              color: color.withValues(alpha: 0.7),
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: AppTextTheme.size12Bold.copyWith(color: color),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SeeAllButton extends StatelessWidget {
+  final String label;
+  final VoidCallback onTap;
+
+  const _SeeAllButton({required this.label, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppRadius.chip),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(AppRadius.chip),
+          border: Border.all(color: AppColors.cardBorder),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              label,
+              style: AppTextTheme.size14Bold.copyWith(
+                color: AppColors.primaryPurple,
+              ),
+            ),
+            const SizedBox(width: 6),
+            Icon(
+              Icons.arrow_forward_rounded,
+              size: 16,
+              color: AppColors.primaryPurple,
+            ),
+          ],
+        ),
       ),
     );
   }

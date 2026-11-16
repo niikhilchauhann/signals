@@ -24,8 +24,8 @@ class WatchlistScreen extends ConsumerStatefulWidget {
 }
 
 class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
-  ChipSource _selected = ChipSource.watchlist;
-  String _search = '';
+  final ValueNotifier<ChipSource> _selected = ValueNotifier(ChipSource.trending);
+  final ValueNotifier<String> _search = ValueNotifier('');
   final TextEditingController _searchCtrl = TextEditingController();
 
   // helpers for display text
@@ -50,7 +50,7 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
   Future<void> _refreshVisibleSource() async {
     final repo = ref.read(stockRepositoryProvider);
     try {
-      switch (_selected) {
+      switch (_selected.value) {
         case ChipSource.trending:
           await repo.fetchTrendingStocks(forceRefresh: true);
           ref.invalidate(trendingStockProvider);
@@ -241,22 +241,30 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
   @override
   void dispose() {
     _searchCtrl.dispose();
+    _selected.dispose();
+    _search.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final watchlist = ref.watch(watchlistProvider);
-    final trending = ref.watch(trendingStockProvider);
-    final nseActive = ref.watch(nseMostActiveProvider);
-    final bseActive = ref.watch(bseMostActiveProvider);
-    final week52 = ref.watch(week52Provider);
-    final priceShockers = ref.watch(priceShockerProvider);
+    return ValueListenableBuilder<ChipSource>(
+      valueListenable: _selected,
+      builder: (context, selectedValue, _) {
+        return ValueListenableBuilder<String>(
+          valueListenable: _search,
+          builder: (context, searchValue, _) {
+            final watchlist = ref.watch(watchlistProvider);
+            final trending = ref.watch(trendingStockProvider);
+            final nseActive = ref.watch(nseMostActiveProvider);
+            final bseActive = ref.watch(bseMostActiveProvider);
+            final week52 = ref.watch(week52Provider);
+            final priceShockers = ref.watch(priceShockerProvider);
 
-    // build the visible item list based on selected chip
-    List<StockModel> visible = [];
+            // build the visible item list based on selected chip
+            List<StockModel> visible = [];
 
-    switch (_selected) {
+            switch (selectedValue) {
       case ChipSource.watchlist:
         // for watchlist, fetch details by symbol from NSE/NSE active providers if available,
         // otherwise create minimal rows with symbol only.
@@ -355,11 +363,11 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
     }
 
     // apply search filter
-    final filtered = _applySearch(visible, _search);
+    final filtered = _applySearch(visible, searchValue);
 
     // track loading state per source to avoid showing empty UI while fetching
     final bool isLoading = () {
-      switch (_selected) {
+      switch (selectedValue) {
         case ChipSource.trending:
           return trending.isLoading;
         case ChipSource.nseActive:
@@ -389,17 +397,17 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
             children: [
               _Header(
                 controller: _searchCtrl,
-                onSearch: (v) => setState(() => _search = v),
+                onSearch: (v) => _search.value = v,
                 onAddSymbol: () => _openAddSymbolDialog(context, ref),
               ),
               _ChipsRow(
-                selected: _selected,
+                selected: selectedValue,
                 labelBuilder: _chipLabel,
-                onSelected: (c) => setState(() {
-                  _selected = c;
-                  _search = '';
+                onSelected: (c) {
+                  _selected.value = c;
+                  _search.value = '';
                   _searchCtrl.clear();
-                }),
+                },
               ),
               Expanded(
                 child: isLoading
@@ -408,7 +416,7 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
                         onRefresh: _refreshVisibleSource,
                         child: filtered.isEmpty
                             ? _EmptyState(
-                                isWatchlist: _selected == ChipSource.watchlist,
+                                isWatchlist: selectedValue == ChipSource.watchlist,
                               )
                             : ListView.separated(
                                 padding: const EdgeInsets.fromLTRB(
@@ -524,6 +532,8 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
         ),
       ),
     );
+        });
+      });
   }
 
   Future<void> _openAddSymbolDialog(BuildContext context, WidgetRef ref) async {

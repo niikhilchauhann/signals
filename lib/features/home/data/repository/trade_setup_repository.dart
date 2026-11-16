@@ -169,6 +169,13 @@ class TradeRepository {
         ? TradeVerdict.watch
         : TradeVerdict.avoid;
 
+    final high20 = closes
+        .sublist(closes.length - 20)
+        .reduce((a, b) => a > b ? a : b);
+    final entryPrice = last;
+    final targetPrice = last + (high20 - support) * 0.6;
+    final stopLossPrice = support * 0.98;
+
     return TradeSetup(
       name: name,
       symbol: symbol.replaceAll('.NS', ''),
@@ -177,6 +184,9 @@ class TradeRepository {
       signals:
           'RSI ${rsi.toStringAsFixed(1)}, Support ${support.toStringAsFixed(0)}, Volume ${volSpike ? 'High' : 'Normal'}',
       verdict: verdict,
+      entry: entryPrice,
+      target: targetPrice,
+      stopLoss: stopLossPrice,
     );
   }
 
@@ -236,6 +246,12 @@ class TradeRepository {
         ? TradeVerdict.watch
         : TradeVerdict.avoid;
 
+    final entryPrice = price > 0 ? price : null;
+    final targetPrice = price > 0 && high > 0
+        ? price + (high - low) * 0.5
+        : null;
+    final stopLossPrice = low > 0 ? low * 0.98 : null;
+
     return TradeSetup(
       name: s.companyName,
       symbol: s.tickerId,
@@ -243,6 +259,9 @@ class TradeRepository {
       horizon: 'Intraday–Swing',
       verdict: verdict,
       signals: signals.join(', '),
+      entry: entryPrice,
+      target: targetPrice,
+      stopLoss: stopLossPrice,
     );
   }
 

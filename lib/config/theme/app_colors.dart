@@ -59,4 +59,24 @@ abstract class AppColors {
   // Extra utility tones
   static const Color darkGrey = Color(0xFF4E5552);
   static const Color surface = Color(0xFF171717);
+
+
+  // ─────────────────────────────────────────
+  // Design System Surface Colors
+  // ─────────────────────────────────────────
+
+  /// Card border color — consistent across all screens
+  static const Color cardBorder = Color(0xFFE3E7F3);
+
+  /// Card fill — subtle light blue
+  static const Color cardFill = Color(0xFFF3F6FF);
+
+  /// Chip / pill background
+  static const Color chipBackground = Color(0xFFEFF2FB);
+
+  /// Background gradient start
+  static const Color bgGradientStart = Color(0xFFF7F9FF);
+
+  /// Background gradient end
+  static const Color bgGradientEnd = Color(0xFFEFF2FF);
 }

@@ -4,36 +4,6 @@ import '../../providers/home_screen_providers.dart';
 import '/core/export.dart';
 import 'package:flutter/material.dart';
 
-// class IndexButtons extends StatelessWidget {
-//   const IndexButtons({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final indexes = ['NIFTY 50', 'BANKNIFTY', 'FINNIFTY', 'MIDCAP'];
-
-//     return SizedBox(
-//       height: 42,
-//       child: ListView.separated(
-//         padding: EdgeInsets.symmetric(horizontal: 16),
-//         scrollDirection: Axis.horizontal,
-//         itemCount: indexes.length,
-//         separatorBuilder: (_, __) => const SizedBox(width: 12),
-//         itemBuilder: (context, index) {
-//           return OutlinedButton(
-//             onPressed: () {},
-//             style: OutlinedButton.styleFrom(
-//               shape: RoundedRectangleBorder(
-//                 borderRadius: BorderRadius.circular(8),
-//               ),
-//             ),
-//             child: Text(indexes[index], style: AppTextTheme.accent14Bold),
-//           );
-//         },
-//       ),
-//     );
-//   }
-// }
-
 class MarketOverviewCard extends ConsumerWidget {
   const MarketOverviewCard({super.key});
 
@@ -45,119 +15,196 @@ class MarketOverviewCard extends ConsumerWidget {
       loading: () => Center(child: const CircularProgressIndicator()).py(32),
       error: (ob, st) {
         debugPrint("Error - $ob - $st");
-        return Text("Error - $ob - $st");
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.cardPadding),
+            decoration: AppDecorations.card(),
+            child: Row(
+              children: [
+                Icon(Icons.info_outline, color: AppColors.grey, size: 20),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Unable to load market data',
+                    style: AppTextTheme.size14Normal.copyWith(
+                      color: AppColors.darkGrey,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
       },
       data: (data) {
         if (data.bias == 'Market Closed') {
-          return Center(
-            child: Text(
-              'Market is closed today.\nCome back during market hours.',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey),
-            ),
-          ).py(24);
-        }
-
-        final biasColor = _biasColor(data.bias);
-
-        return Container(
-          width: double.maxFinite,
-          padding: const EdgeInsets.all(20),
-          margin: const EdgeInsets.symmetric(horizontal: 16),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                biasColor.withValues(alpha: 0.95),
-                biasColor.withValues(alpha: 0.85),
-                biasColor.withValues(alpha: 0.70),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(18),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 18,
-                offset: Offset(0, 12),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+            child: Container(
+              padding: const EdgeInsets.all(AppSpacing.cardPadding),
+              decoration: AppDecorations.card(),
+              child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
+                    width: 40,
+                    height: 40,
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.16),
+                      color: AppColors.grey.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
+                    child: Icon(Icons.access_time_rounded,
+                        color: AppColors.grey, size: 20),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(Icons.circle, color: Colors.white, size: 10),
-                        const SizedBox(width: 8),
+                        Text('Market Closed', style: AppTextTheme.size16Bold),
+                        const SizedBox(height: 2),
                         Text(
-                          data.bias,
-                          style: AppTextTheme.size14Bold.copyWith(
-                            color: Colors.white,
+                          'Come back during market hours',
+                          style: AppTextTheme.size12Normal.copyWith(
+                            color: AppColors.grey,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const Spacer(),
-                  Text(
-                    'Today',
-                    style: AppTextTheme.size14Normal.copyWith(
-                      color: Colors.white70,
+                ],
+              ),
+            ),
+          );
+        }
+
+        final biasColor = _biasColor(data.bias);
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+          child: Container(
+            width: double.maxFinite,
+            padding: const EdgeInsets.all(AppSpacing.cardPadding),
+            decoration: AppDecorations.card(radius: AppRadius.cardLarge),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header row: bias chip + "Today" label
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: AppDecorations.chip(color: biasColor),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.circle, color: biasColor, size: 8),
+                          const SizedBox(width: 6),
+                          Text(
+                            data.bias,
+                            style: AppTextTheme.size12Bold.copyWith(
+                              color: biasColor,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 14),
-              Text(
-                'Market Overview',
-                style: AppTextTheme.size18Bold.copyWith(color: Colors.white),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'Key intraday levels to guide your entries and exits.',
-                style: AppTextTheme.size14Normal.copyWith(
-                  color: Colors.white.withValues(alpha: 0.85),
+                    const Spacer(),
+                    Text(
+                      'Today',
+                      style: AppTextTheme.size12Normal.copyWith(
+                        color: AppColors.grey,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 18),
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: [
-                  _MetricPill(
-                    label: 'Intraday High',
-                    value: data.intradayHigh.toStringAsFixed(0),
+                const SizedBox(height: 14),
+
+                // Title
+                Text('Market Overview', style: AppTextTheme.size18Bold),
+                const SizedBox(height: 4),
+                Text(
+                  'Key intraday levels to guide your entries and exits.',
+                  style: AppTextTheme.size14Normal.copyWith(
+                    color: AppColors.grey,
                   ),
-                  _MetricPill(
-                    label: 'Intraday Low',
-                    value: data.intradayLow.toStringAsFixed(0),
+                ),
+                const SizedBox(height: 16),
+
+                // Metrics in 2x2 grid
+                Row(
+                  children: [
+                    Expanded(
+                      child: _MetricCard(
+                        label: 'Intraday High',
+                        value: data.intradayHigh.toStringAsFixed(0),
+                        icon: Icons.arrow_upward_rounded,
+                        color: AppColors.green,
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.innerGap),
+                    Expanded(
+                      child: _MetricCard(
+                        label: 'Intraday Low',
+                        value: data.intradayLow.toStringAsFixed(0),
+                        icon: Icons.arrow_downward_rounded,
+                        color: AppColors.redLight,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.innerGap),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _MetricCard(
+                        label: 'Buy Above',
+                        value: data.buyAbove.toStringAsFixed(0),
+                        icon: Icons.trending_up_rounded,
+                        color: AppColors.green,
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.innerGap),
+                    Expanded(
+                      child: _MetricCard(
+                        label: 'Sell Below',
+                        value: data.sellBelow.toStringAsFixed(0),
+                        icon: Icons.trending_down_rounded,
+                        color: AppColors.redLight,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+
+                // Note
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: AppDecorations.infoContainer(),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.notes_rounded,
+                          color: AppColors.grey, size: 16),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          data.note,
+                          style: AppTextTheme.size12Normal.copyWith(
+                            color: AppColors.darkGrey,
+                            height: 1.4,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  _MetricPill(
-                    label: 'Buy Above',
-                    value: data.buyAbove.toStringAsFixed(0),
-                  ),
-                  _MetricPill(
-                    label: 'Sell Below',
-                    value: data.sellBelow.toStringAsFixed(0),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              _NoteCard(note: data.note),
-            ],
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -176,68 +223,53 @@ Color _biasColor(String bias) {
   }
 }
 
-class _MetricPill extends StatelessWidget {
+class _MetricCard extends StatelessWidget {
   final String label;
   final String value;
+  final IconData icon;
+  final Color color;
 
-  const _MetricPill({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white24),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            label,
-            style: AppTextTheme.size12Normal.copyWith(
-              color: Colors.white.withValues(alpha: 0.85),
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            value,
-            style: AppTextTheme.size16Bold.copyWith(color: Colors.white),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _NoteCard extends StatelessWidget {
-  final String note;
-
-  const _NoteCard({required this.note});
+  const _MetricCard({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.16),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white24),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppRadius.chip),
+        border: Border.all(color: AppColors.cardBorder),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.notes_rounded, color: Colors.white70, size: 18),
-          const SizedBox(width: 10),
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: color, size: 16),
+          ),
+          const SizedBox(width: 8),
           Expanded(
-            child: Text(
-              note,
-              style: AppTextTheme.size14Normal.copyWith(
-                color: Colors.white.withValues(alpha: 0.9),
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: AppTextTheme.size10Normal.copyWith(
+                    color: AppColors.grey,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(value, style: AppTextTheme.size14Bold),
+              ],
             ),
           ),
         ],

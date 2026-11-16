@@ -2,6 +2,7 @@ export 'app_structure.dart';
 export '../config/theme/app_theme.dart';
 export '../config/theme/app_text_theme.dart';
 export '../config/theme/app_colors.dart';
+export '../config/theme/design_constants.dart';
 export '../config/constants/app_assets.dart';
 export '../config/constants/url_constants.dart';
 export '../core/extensions/app_extensions.dart';

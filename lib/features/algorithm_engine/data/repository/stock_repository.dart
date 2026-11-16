@@ -1,4 +1,4 @@
-import 'package:cupcake/config/api/api_service.dart';
+import '/config/api/api_service.dart';
 
 import '../models/ipo_model.dart';
 import '../models/commodities_model.dart';

@@ -1,4 +1,4 @@
-import 'package:cupcake/features/algorithm_engine/data/models/ipo_model.dart';
+import '/features/algorithm_engine/data/models/ipo_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -34,8 +34,8 @@ class IpoScreen extends ConsumerWidget {
                   ref.read(sortProvider.notifier).state = !sortLatest;
                 },
               ),
-              _searchBar(ref),
-              _filterChips(ref, filter),
+              const _SearchBar(),
+              _FilterChips(selected: filter),
               Expanded(
                 child: ipoAsync.when(
                   data: (ipo) {
@@ -115,77 +115,89 @@ class _Header extends StatelessWidget {
 }
 
 // 🔍 Search Bar
-Widget _searchBar(WidgetRef ref) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 16),
-    child: TextField(
-      decoration: InputDecoration(
-        hintText: "Search by name or symbol",
-        prefixIcon: const Icon(Icons.search),
-        filled: true,
-        fillColor: Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFE3E7F3)),
+class _SearchBar extends ConsumerWidget {
+  const _SearchBar();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: TextField(
+        decoration: InputDecoration(
+          hintText: "Search by name or symbol",
+          prefixIcon: const Icon(Icons.search),
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: Color(0xFFE3E7F3)),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: Color(0xFFE3E7F3)),
+          ),
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFE3E7F3)),
-        ),
+        onChanged: (val) => ref.read(searchProvider.notifier).state = val,
       ),
-      onChanged: (val) => ref.read(searchProvider.notifier).state = val,
-    ),
-  );
+    );
+  }
 }
 
 // 🎯 Filter Chips
-Widget _filterChips(WidgetRef ref, String selected) {
-  final filters = [
-    ('upcoming', Icons.watch_later_rounded),
-    ('active', Icons.trending_up_rounded),
-    ('listed', Icons.check_circle_rounded),
-    ('closed', Icons.lock_clock_rounded),
-  ];
+class _FilterChips extends ConsumerWidget {
+  final String selected;
 
-  return SingleChildScrollView(
-    scrollDirection: Axis.horizontal,
-    padding: const EdgeInsets.fromLTRB(14, 12, 14, 8),
-    child: Row(
-      children: filters.map((f) {
-        final isSelected = selected == f.$1;
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 6),
-          child: ChoiceChip(
-            label: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  f.$2,
-                  size: 16,
-                  color: isSelected ? Colors.white : AppColors.darkGrey,
-                ),
-                const SizedBox(width: 6),
-                Text(f.$1.toUpperCase()),
-              ],
+  const _FilterChips({required this.selected});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final filters = [
+      ('upcoming', Icons.watch_later_rounded),
+      ('active', Icons.trending_up_rounded),
+      ('listed', Icons.check_circle_rounded),
+      ('closed', Icons.lock_clock_rounded),
+    ];
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 8),
+      child: Row(
+        children: filters.map((f) {
+          final isSelected = selected == f.$1;
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6),
+            child: ChoiceChip(
+              label: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    f.$2,
+                    size: 16,
+                    color: isSelected ? Colors.white : AppColors.darkGrey,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(f.$1.toUpperCase()),
+                ],
+              ),
+              selected: isSelected,
+              selectedColor: AppColors.primaryPurple,
+              backgroundColor: Colors.white,
+              labelStyle: AppTextTheme.size12Bold.copyWith(
+                color: isSelected ? Colors.white : AppColors.darkGrey,
+              ),
+              side: BorderSide(
+                color: isSelected
+                    ? AppColors.primaryPurple
+                    : const Color(0xFFE3E7F3),
+              ),
+              onSelected: (_) =>
+                  ref.read(ipoFilterProvider.notifier).state = f.$1,
             ),
-            selected: isSelected,
-            selectedColor: AppColors.primaryPurple,
-            backgroundColor: Colors.white,
-            labelStyle: AppTextTheme.size12Bold.copyWith(
-              color: isSelected ? Colors.white : AppColors.darkGrey,
-            ),
-            side: BorderSide(
-              color: isSelected
-                  ? AppColors.primaryPurple
-                  : const Color(0xFFE3E7F3),
-            ),
-            onSelected: (_) =>
-                ref.read(ipoFilterProvider.notifier).state = f.$1,
-          ),
-        );
-      }).toList(),
-    ),
-  );
+          );
+        }).toList(),
+      ),
+    );
+  }
 }
 
 // 🧠 Filter Logic
